@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moneyboard.ServerSide", "Moneyboard.ServerSide\Moneyboard.ServerSide.csproj", "{5E9834D4-282F-426F-B9C2-39D64D4DC409}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moneyboard.ServerSide", "Moneyboard.ServerSide\Moneyboard.ServerSide.csproj", "{5E9834D4-282F-426F-B9C2-39D64D4DC409}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moneyboard.Core", "Moneyboard.Core\Moneyboard.Core.csproj", "{733DEB95-FD18-48D2-82E3-B96D3B869886}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moneyboard.Infrastructure", "Moneyboard.Infrastructure\Moneyboard.Infrastructure.csproj", "{94A49014-6A09-4771-A275-FC06AF890BBF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{5E9834D4-282F-426F-B9C2-39D64D4DC409}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E9834D4-282F-426F-B9C2-39D64D4DC409}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E9834D4-282F-426F-B9C2-39D64D4DC409}.Release|Any CPU.Build.0 = Release|Any CPU
+		{733DEB95-FD18-48D2-82E3-B96D3B869886}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{733DEB95-FD18-48D2-82E3-B96D3B869886}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{733DEB95-FD18-48D2-82E3-B96D3B869886}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{733DEB95-FD18-48D2-82E3-B96D3B869886}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94A49014-6A09-4771-A275-FC06AF890BBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94A49014-6A09-4771-A275-FC06AF890BBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94A49014-6A09-4771-A275-FC06AF890BBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94A49014-6A09-4771-A275-FC06AF890BBF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
