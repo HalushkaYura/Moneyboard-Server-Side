@@ -12,7 +12,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Moneyboard.Core.Interfaces.Service;
+using Moneyboard.Core.Interfaces.Services;
 
 namespace Maneyboard.Core.Services
 {
