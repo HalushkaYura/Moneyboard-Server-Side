@@ -4,31 +4,31 @@ using Moneyboard.Core.DTO.UserDTO;
 using Moneyboard.Core.Entities.RefreshTokenEntity;
 using Moneyboard.Core.Entities.UserEntity;
 using Moneyboard.Core.Exceptions;
+using Moneyboard.Core.Interfaces.Repository;
 using Moneyboard.Core.Interfaces.Service;
-using Nest;
-using Moneyboard.Core.Interfaces.Repositor;
-
+using System.Text;
 
 namespace Moneyboard.Core.Services
 {
-    public class AuthentificationService : IAuthentificationService
+    public class AuthentificationServices : IAuthentificationServices
 
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly IJwtService _jwtService;
-        //protected readonly IRepository<RefreshToken> _refreshTokenRepository;
-        protected readonly IRepositor<RefreshToken> _refreshTokenRepository;
+        protected readonly IRepository<RefreshToken> _refreshTokenRepository;
+        protected readonly RoleManager<IdentityRole> _roleManager;
+
 
         // private readonly IConfiguration _configuration;
 
-        public AuthentificationService(UserManager<User> userManager, IRepositor<RefreshToken> refreshTokenRepository, IJwtService jwtService, SignInManager<User> signInManager)
+        public AuthentificationServices(UserManager<User> userManager, Interfaces.Repository.IRepository<RefreshToken> refreshTokenRepository, IJwtService jwtService, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _jwtService = jwtService;
             _refreshTokenRepository = refreshTokenRepository;
-
+            _roleManager = roleManager;
         }
 
         public async Task<UserAutorizationDTO> LoginAsync(string email, string password)
@@ -50,10 +50,32 @@ namespace Moneyboard.Core.Services
 
         //REGISTRATION 
 
-        public Task RegistrationAsync(User user, string password)
+        public async Task RegistrationAsync(User user, string password, string roleName)
         {
-            throw new NotImplementedException();
+            user.CreateDate = DateTime.UtcNow;
+            var result = await _userManager.CreateAsync(user, password);
+
+            if (!result.Succeeded)
+            {
+                StringBuilder errorMessage = new();
+                foreach (var error in result.Errors)
+                {
+                    errorMessage.Append(error.Description.ToString() + " ");
+                }
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, errorMessage.ToString());
+            }
+
+            var findRole = await _roleManager.FindByNameAsync(roleName);
+
+            if (findRole == null)
+            {
+                await _roleManager.CreateAsync(new IdentityRole(roleName));
+            }
+
+            await _userManager.AddToRoleAsync(user, roleName);
         }
+
+
 
         private async Task<UserAutorizationDTO> GenerateUserTokens(User user)
         {

@@ -6,15 +6,9 @@ using Moneyboard.Core.Entities.RefreshTokenEntity;
 using Moneyboard.Core.Entities.RoleEntity;
 using Moneyboard.Core.Entities.UserEntity;
 using Moneyboard.Core.Entities.UserProjectEntity;
-using Nest;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Moneyboard.Core.Entities.RefreshTokenEntity.RefreshTocenConfiguration;
 
-namespace Moneyboard.Infrastructure.Date
+namespace Moneyboard.Infrastructure.Data
 {
     public class MoneyboardDb : IdentityDbContext<User>
     {

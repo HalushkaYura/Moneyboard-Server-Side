@@ -1,10 +1,6 @@
 ﻿
 using Moneyboard.Core.Entities.UserEntity;
 using Moneyboard.Core.Interfaces;
-using Nest;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Moneyboard.Core.Entities.RefreshTokenEntity
 {

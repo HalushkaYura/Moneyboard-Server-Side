@@ -1,6 +1,6 @@
-﻿namespace Moneyboard.Core.Interfaces.Repositor
+﻿namespace Moneyboard.Core.Interfaces.Repository
 {
-    public interface IRepositor<TEntity> where TEntity : IBaseEntity
+    public interface IRepository<TEntity> where TEntity : IBaseEntity
     {
         Task<TEntity> AddAsync(TEntity entity);
         Task<IEnumerable<TEntity>> GetAllAsync();

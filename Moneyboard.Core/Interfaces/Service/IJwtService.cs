@@ -7,11 +7,11 @@ namespace Moneyboard.Core.Interfaces.Service
 {
     public interface IJwtService
     {
-          IEnumerable<Claim> SetClaims(User user);
-          string CreateToken(IEnumerable<Claim> claims);
-          string CreateRefreshToken();
-          IEnumerable<Claim> GetClaimsFromExpiredToken(string token);
-          Task<GoogleJsonWebSignature.Payload> VerifyGoogleToken(UserExternalAuthDTO authDTO);
+        IEnumerable<Claim> SetClaims(User user);
+        string CreateToken(IEnumerable<Claim> claims);
+        string CreateRefreshToken();
+        IEnumerable<Claim> GetClaimsFromExpiredToken(string token);
+        Task<GoogleJsonWebSignature.Payload> VerifyGoogleToken(UserExternalAuthDTO authDTO);
 
     }
 }

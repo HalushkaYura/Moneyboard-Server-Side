@@ -18,7 +18,7 @@ namespace Moneyboard.Core.Entities.UserEntity
         public string Lastname { get; set; }
         public string ImageUrl { get; set; }
         public string Email { get; set; }
-        public DateTime BirstDate { get; set; }
+        public DateTime BirthDate { get; set; }
         public DateTime CreateDate { get; set; }
         public string CardNumber { get; set; }
 

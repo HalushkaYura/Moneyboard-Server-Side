@@ -13,6 +13,7 @@ namespace Moneyboard.Core.DTO.UserDTO
         public string Email { get; set; }
         public string Password { get; set; }
         public string CardNumber { get; set; }
-        public DateTimeOffset? BirthDay { get; set; }
+        public DateTime BirthDay { get; set; }
+        public string ImageUrl { get; set; }
     }
 }

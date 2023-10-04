@@ -1,21 +1,19 @@
 ﻿using Abp.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Moneyboard.Core.Interfaces;
-using Moneyboard.Core.Interfaces.Repositor;
+using Moneyboard.Core.Interfaces.Repository;
 
-namespace Moneyboard.Infrastructure.Date.Repositories
+namespace Moneyboard.Infrastructure.Data.Repositories
 {
-    public class BaseRepositor<TEntity> : IRepositor<TEntity> where TEntity : class, IBaseEntity
+    public class BaseRepository<TEntity> : Core.Interfaces.Repository.IRepository<TEntity> where TEntity : class, IBaseEntity
     {
         protected readonly MoneyboardDb _dbContext;
         protected readonly DbSet<TEntity> _dbSet;
-        public BaseRepositor(MoneyboardDb dbContext)
+        public BaseRepository(MoneyboardDb dbContext)
         {
             _dbContext = dbContext;
             _dbSet = _dbContext.Set<TEntity>();
-
         }
-
 
         public async Task<IEnumerable<TEntity>> GetAllAsync()
         {

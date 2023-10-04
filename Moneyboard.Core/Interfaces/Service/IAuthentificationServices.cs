@@ -3,9 +3,9 @@ using Moneyboard.Core.Entities.UserEntity;
 
 namespace Moneyboard.Core.Interfaces.Service
 {
-    public interface IAuthentificationService
+    public interface IAuthentificationServices
     {
-        Task RegistrationAsync(User user, string password);
+        Task RegistrationAsync(User user, string password, string roleName);
         Task<UserAutorizationDTO> LoginAsync(string email, string password);
         // Task<UserAutorizationDTO> RefreshTokenAsync(UserAutorizationDTO userTokensDTO);
         Task LogoutAsync();

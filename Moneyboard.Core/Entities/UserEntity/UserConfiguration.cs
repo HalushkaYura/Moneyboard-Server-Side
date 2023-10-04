@@ -17,7 +17,7 @@ namespace Moneyboard.Core.Entities.UserEntity
                 .HasKey(x => x.Id);
 
             builder
-                .Property(x => x.BirstDate)
+                .Property(x => x.BirthDate)
                 .IsRequired();
 
             builder
