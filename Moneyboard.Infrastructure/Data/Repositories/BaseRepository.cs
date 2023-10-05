@@ -1,11 +1,12 @@
-﻿using Abp.Domain.Repositories;
+﻿using Ardalis.Specification;
+using Ardalis.Specification.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Moneyboard.Core.Interfaces;
 using Moneyboard.Core.Interfaces.Repository;
 
 namespace Moneyboard.Infrastructure.Data.Repositories
 {
-    public class BaseRepository<TEntity> : Core.Interfaces.Repository.IRepository<TEntity> where TEntity : class, IBaseEntity
+    public class BaseRepository<TEntity> : IRepository<TEntity> where TEntity : class, IBaseEntity
     {
         protected readonly MoneyboardDb _dbContext;
         protected readonly DbSet<TEntity> _dbSet;
@@ -14,7 +15,18 @@ namespace Moneyboard.Infrastructure.Data.Repositories
             _dbContext = dbContext;
             _dbSet = _dbContext.Set<TEntity>();
         }
+        public async Task<TEntity> GetFirstBySpecAsync(ISpecification<TEntity> specification)
+        {
+            var res = await ApplySpecification(specification).FirstOrDefaultAsync();
+            return res;
 
+        }
+
+        private IQueryable<TEntity> ApplySpecification(ISpecification<TEntity> specification)
+        {
+            var evaluator = new SpecificationEvaluator();
+            return evaluator.GetQuery(_dbSet, specification);
+        }
         public async Task<IEnumerable<TEntity>> GetAllAsync()
         {
             return await _dbSet.ToListAsync();

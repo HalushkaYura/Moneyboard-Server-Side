@@ -1,16 +1,18 @@
-﻿using Maneyboard.Core.Resources;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Moneyboard.Core.DTO.UserDTO;
 using Moneyboard.Core.Entities.RefreshTokenEntity;
 using Moneyboard.Core.Entities.UserEntity;
 using Moneyboard.Core.Exceptions;
 using Moneyboard.Core.Interfaces.Repository;
-using Moneyboard.Core.Interfaces.Service;
+using Moneyboard.Core.Interfaces.Services;
+using Moneyboard.Core.Resources;
 using System.Text;
 
 namespace Moneyboard.Core.Services
 {
-    public class AuthentificationServices : IAuthentificationServices
+    public class AuthenticationService : Interfaces.Services.IAuthenticationService
 
     {
         private readonly UserManager<User> _userManager;
@@ -18,11 +20,12 @@ namespace Moneyboard.Core.Services
         private readonly IJwtService _jwtService;
         protected readonly IRepository<RefreshToken> _refreshTokenRepository;
         protected readonly RoleManager<IdentityRole> _roleManager;
+        private readonly Microsoft.AspNetCore.Authentication.IAuthenticationService authenticationService;
 
 
         // private readonly IConfiguration _configuration;
 
-        public AuthentificationServices(UserManager<User> userManager, Interfaces.Repository.IRepository<RefreshToken> refreshTokenRepository, IJwtService jwtService, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager)
+        public AuthenticationService(UserManager<User> userManager, Interfaces.Repository.IRepository<RefreshToken> refreshTokenRepository, IJwtService jwtService, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -30,12 +33,12 @@ namespace Moneyboard.Core.Services
             _refreshTokenRepository = refreshTokenRepository;
             _roleManager = roleManager;
         }
+        //------------------------------ LOGIN ---------------------------------------
 
         public async Task<UserAutorizationDTO> LoginAsync(string email, string password)
         {
-            var user = await _userManager.FindByEmailAsync(email);
-
-            if (user == null || !await _userManager.CheckPasswordAsync(user, password))
+            var user = await _userManager.FindByNameAsync(email);
+            if (user == null && !await _userManager.CheckPasswordAsync(user, password))
             {
                 throw new HttpException(System.Net.HttpStatusCode.Unauthorized, ErrorMessages.IncorrectLoginOrPassword);
             }
@@ -43,12 +46,15 @@ namespace Moneyboard.Core.Services
             return await GenerateUserTokens(user);
         }
 
+      
+        //------------------------------ LOGOUT ---------------------------------------
+
         public async Task LogoutAsync()
         {
             await _signInManager.SignOutAsync();
         }
 
-        //REGISTRATION 
+        //------------------------------ REGISTRATION ---------------------------------------
 
         public async Task RegistrationAsync(User user, string password, string roleName)
         {
@@ -108,6 +114,32 @@ namespace Moneyboard.Core.Services
             return (string)refeshToken;
         }
 
+        public async Task<UserAutorizationDTO> RefreshTokenAsync(UserAutorizationDTO userTokensDTO)
+        {
+            var specification = new RefreshTokens.SearchRefreshToken(userTokensDTO.RefreshToken);
+            var refeshTokenFromDb = await _refreshTokenRepository.GetFirstBySpecAsync(specification);
+
+            if (refeshTokenFromDb == null)
+            {
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.InvalidToken);
+            }
+
+            var claims = _jwtService.GetClaimsFromExpiredToken(userTokensDTO.Token);
+            var newToken = _jwtService.CreateToken(claims);
+            var newRefreshToken = _jwtService.CreateRefreshToken();
+
+            refeshTokenFromDb.Token = newRefreshToken;
+            await _refreshTokenRepository.UpdateAsync(refeshTokenFromDb);
+            await _refreshTokenRepository.SaveChangesAsync();
+
+            var tokens = new UserAutorizationDTO()
+            {
+                Token = newToken,
+                RefreshToken = newRefreshToken
+            };
+
+            return tokens;
+        }
 
 
 

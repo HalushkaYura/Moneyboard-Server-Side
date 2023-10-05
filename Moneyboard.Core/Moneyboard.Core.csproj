@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Abp" Version="8.3.1" />
+    <PackageReference Include="Ardalis.Specification" Version="7.0.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageReference Include="Google.Apis.Auth" Version="1.62.1" />
     <PackageReference Include="GreenPipes" Version="4.0.1" />

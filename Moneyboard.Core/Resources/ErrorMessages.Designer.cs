@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Maneyboard.Core.Resources {
+namespace Moneyboard.Core.Resources {
     using System;
     
     
@@ -57,6 +57,15 @@ namespace Maneyboard.Core.Resources {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You already confirmed your email address!.
+        /// </summary>
+        internal static string AlreadyComfirmEmail {
+            get {
+                return ResourceManager.GetString("AlreadyComfirmEmail", resourceCulture);
             }
         }
         
@@ -516,15 +525,6 @@ namespace Maneyboard.Core.Resources {
         internal static string WrongResetPasswordCode {
             get {
                 return ResourceManager.GetString("WrongResetPasswordCode", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to You already confirmed your email address!.
-        /// </summary>
-        internal static string x {
-            get {
-                return ResourceManager.GetString("x", resourceCulture);
             }
         }
     }

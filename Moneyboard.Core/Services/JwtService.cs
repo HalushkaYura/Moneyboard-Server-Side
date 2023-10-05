@@ -1,29 +1,32 @@
 ﻿using Google.Apis.Auth;
-using Jose;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Moneyboard.Core.DTO.UserDTO;
 using Moneyboard.Core.Entities.UserEntity;
+using Moneyboard.Core.Exeptions;
 using Moneyboard.Core.Helpers;
-using ServiceStack;
-using ServiceStack.Host;
+using Moneyboard.Core.Interfaces.Services;
+using Moneyboard.Core.Resources;
+using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Moneyboard.Core.Interfaces.Service;
-
-namespace Maneyboard.Core.Services
+using System.Threading.Tasks;
+namespace Moneyboard.Core.Services
 {
     public class JwtService : IJwtService
     {
-        private readonly Microsoft.Extensions.Options.IOptions<Moneyboard.Core.Helpers.JwtOptions> jwtOptions;
+        private readonly IOptions<JwtOptions> jwtOptions;
         private readonly UserManager<User> userManager;
         protected readonly IConfigurationSection _googleSettings;
         private readonly IConfiguration _configuration;
 
-        public JwtService(Microsoft.Extensions.Options.IOptions<Moneyboard.Core.Helpers.JwtOptions> jwtOptions, UserManager<User> userManager,
+        public JwtService(IOptions<JwtOptions> jwtOptions, UserManager<User> userManager,
             IConfiguration configuration)
         {
             this.jwtOptions = jwtOptions;
@@ -73,7 +76,7 @@ namespace Maneyboard.Core.Services
             jwtSecurityToken = securityToken as JwtSecurityToken;
 
             if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-                throw new HttpException((int)System.Net.HttpStatusCode.BadRequest, ErrorMessages.InvalidAccessToken);
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.InvalidToken);
 
             return jwtSecurityToken.Claims;
         }
@@ -83,7 +86,7 @@ namespace Maneyboard.Core.Services
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Name, user.Email),
+                new Claim(ClaimTypes.Name, user.UserName),
             };
 
             var roles = userManager.GetRolesAsync(user).Result;

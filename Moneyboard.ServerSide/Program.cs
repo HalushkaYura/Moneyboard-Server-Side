@@ -1,45 +1,45 @@
 using Microsoft.EntityFrameworkCore;
 using Moneyboard.Core;
-using Moneyboard.Core.Interfaces.Repository;
+using Moneyboard.Core.Helpers;
 using Moneyboard.Infrastructure;
-using Moneyboard.Infrastructure.Data.Repositories;
+using Moneyboard.Core;
+using Moneyboard.WebApi.ServiceExtension;
+using Moneyboard.Core.Services;
+using Moneyboard.Core.Interfaces.Services;
 
 namespace Moneyboard.ServerSide
 {
     public class Program
     {
-        private readonly IConfiguration Configuration;
-
-        public Program(IConfiguration configuration)
+        public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            Configuration = configuration;
-        }
-        public void ConfigureServices(IServiceCollection services)
-        {
-
-            //services.ConfigureImageSettings(Configuration);
+            
             services.AddControllers();
-            services.AddDbContext(Configuration.GetConnectionString("DefaultConnection"));
+            services.AddDbContext(configuration.GetConnectionString("DefaultConnection"));
             services.AddIdentityDbContext();
             services.AddAuthentication();
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.Configure<JwtOptions>(configuration.GetSection("JwtOptions"));
+
             services.AddRepositories();
             services.AddCustomServices();
             services.AddFluentValitation();
-            //services.ConfigJwtOptions(_configuration.GetSection("JwtOptions"));
-            services.AddAuthentification();
+            services.AddAuthentication(); 
+          //  services.ConfigJwtOptions(configuration.GetSection("JwtOption"));
+
+            //services.ConfigureImageSettings(Configuration);
+
             //services.AddAutoMapper();
 
-            //services.AddJwtAuthentication(Configuration);
+            services.AddJwtAuthentication(configuration);
             services.AddCors();
             services.AddMvcCore().AddRazorViewEngine();
         }
         public static void Main(string[] args)
         {
-
+           
             var builder = WebApplication.CreateBuilder(args);
-
-            var program = new Program(builder.Configuration);
-            program.ConfigureServices(builder.Services);
+            ConfigureServices(builder.Services, builder.Configuration);
 
 
 

@@ -3,7 +3,7 @@ using Moneyboard.Core.DTO.UserDTO;
 using Moneyboard.Core.Entities.UserEntity;
 using System.Security.Claims;
 
-namespace Moneyboard.Core.Interfaces.Service
+namespace Moneyboard.Core.Interfaces.Services
 {
     public interface IJwtService
     {

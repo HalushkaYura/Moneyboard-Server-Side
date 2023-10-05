@@ -1,4 +1,6 @@
-﻿namespace Moneyboard.Core.Interfaces.Repository
+﻿using Ardalis.Specification;
+
+namespace Moneyboard.Core.Interfaces.Repository
 {
     public interface IRepository<TEntity> where TEntity : IBaseEntity
     {
@@ -10,6 +12,7 @@
         Task DeleteAsync(TEntity entity);
         Task<int> SaveChangesAsync();
         Task AddRangeAsync(List<TEntity> entities);
+        Task<TEntity> GetFirstBySpecAsync(ISpecification<TEntity> specification);
         //Task DeleteRangeAsync(IEnumerable<TEntity> entities);
         //IQueryable<TEntity> Query(params Expression<Func<TEntity, object>>[] includes);
         //Task<int> SqlQuery(string sqlQuery);

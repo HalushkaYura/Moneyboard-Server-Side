@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moneyboard.Core.DTO.UserDTO;
 using Moneyboard.Core.Entities.UserEntity;
-using Moneyboard.Core.Interfaces.Service;
+using Moneyboard.Core.Interfaces.Services;
 using Moneyboard.Core.Roles;
 
 namespace Moneyboard.ServerSide.Controllers
@@ -12,8 +12,8 @@ namespace Moneyboard.ServerSide.Controllers
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        private readonly IAuthentificationServices _authenticationService;
-        public AuthenticationController(IAuthentificationServices authenticationService)
+        private readonly Core.Interfaces.Services.IAuthenticationService _authenticationService;
+        public AuthenticationController(Core.Interfaces.Services.IAuthenticationService authenticationService)
         {
             _authenticationService = authenticationService;
         }
@@ -42,9 +42,9 @@ namespace Moneyboard.ServerSide.Controllers
         [Route("login")]
         public async Task<IActionResult> LoginAsync([FromBody] UserLoginDTO userLoginDTO)
         {
-            var token = await _authenticationService.LoginAsync(userLoginDTO.Email, userLoginDTO.Password);
+            var tokens = await _authenticationService.LoginAsync(userLoginDTO.Email, userLoginDTO.Password);
 
-            return Ok(token);
+            return Ok(tokens);
         }
 
         [HttpPost]
