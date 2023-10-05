@@ -3,7 +3,7 @@ using Maneyboard.Core.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Moneyboard.Core.Helpers;
-using Moneyboard.Core.Interfaces.Services;
+using Moneyboard.Core.Interfaces.Service;
 using Moneyboard.Core.Roles;
 using Moneyboard.Core.Services;
 using System.IO;

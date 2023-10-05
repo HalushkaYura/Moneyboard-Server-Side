@@ -1,6 +1,4 @@
-﻿using Moneyboard.Core.Entities.RefreshTokenEntity;
-
-namespace Moneyboard.Core.Interfaces.Repository
+﻿namespace Moneyboard.Core.Interfaces.Repository
 {
     public interface IRepository<TEntity> where TEntity : IBaseEntity
     {
