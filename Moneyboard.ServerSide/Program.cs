@@ -1,11 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Moneyboard.Core;
 using Moneyboard.Core.Helpers;
-using Moneyboard.Infrastructure;
-using Moneyboard.Core;
-using Moneyboard.WebApi.ServiceExtension;
-using Moneyboard.Core.Services;
 using Moneyboard.Core.Interfaces.Services;
+using Moneyboard.Core.Services;
+using Moneyboard.Infrastructure;
+using Moneyboard.WebApi.ServiceExtension;
 
 namespace Moneyboard.ServerSide
 {
@@ -13,19 +12,20 @@ namespace Moneyboard.ServerSide
     {
         public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            
+
             services.AddControllers();
             services.AddDbContext(configuration.GetConnectionString("DefaultConnection"));
             services.AddIdentityDbContext();
             services.AddAuthentication();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.Configure<JwtOptions>(configuration.GetSection("JwtOptions"));
-
+            services.AddScoped<ITemplateService, TemplateService>();
+            services.AddScoped<IEmailSenderService, EmailSenderService>();
+            services.AddScoped<IConfirmEmailService, ConfirmEmailService>();
             services.AddRepositories();
             services.AddCustomServices();
             services.AddFluentValitation();
-            services.AddAuthentication(); 
-          //  services.ConfigJwtOptions(configuration.GetSection("JwtOption"));
+            services.AddAuthentication();
 
             //services.ConfigureImageSettings(Configuration);
 
@@ -37,7 +37,7 @@ namespace Moneyboard.ServerSide
         }
         public static void Main(string[] args)
         {
-           
+
             var builder = WebApplication.CreateBuilder(args);
             ConfigureServices(builder.Services, builder.Configuration);
 

@@ -34,10 +34,10 @@ namespace Moneyboard.Core
             //services.AddFluentValidation(c => c.RegisterValidatorsFromAssemblyContaining<UserLogValidation>());
         }
 
-        public static void ConfigJwtOptions(this IServiceCollection services, IConfiguration config)
+        /*public static void ConfigJwtOptions(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<JwtOptions>(config);
-        }
+            services.Configure<JwtOptions>(configuration.GetSection("JwtOption"));
+        }*/
 
         public static void ConfigureMailSettings(this IServiceCollection services, IConfiguration configuration)
         {

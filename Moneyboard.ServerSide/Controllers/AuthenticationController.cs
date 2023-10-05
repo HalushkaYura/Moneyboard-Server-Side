@@ -49,11 +49,56 @@ namespace Moneyboard.ServerSide.Controllers
 
         [HttpPost]
         [Route("logout")]
-        public async Task<IActionResult> LogoutAsync()
+        public async Task<IActionResult> LogoutAsync([FromBody] UserAutorizationDTO userTokensDTO)
         {
-            await _authenticationService.LogoutAsync();
+            await _authenticationService.LogoutAsync(userTokensDTO);
 
             return NoContent();
+        }
+
+
+        [HttpGet]
+        [Route("password/{email}")]
+        public async Task<IActionResult> SentResetPasswordTokenAsync(string email)
+        {
+            await _authenticationService.SentResetPasswordTokenAsync(email);
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("login-two-step")]
+        public async Task<IActionResult> LoginTwoStepAsync([FromBody] UserTwoFactorDTO twoFactorDTO)
+        {
+            var tokens = await _authenticationService.LoginTwoStepAsync(twoFactorDTO);
+
+            return Ok(tokens);
+        }
+
+        [HttpPost]
+        [Route("refresh-token")]
+        public async Task<IActionResult> RefreshTokenAsync([FromBody] UserAutorizationDTO userTokensDTO)
+        {
+            var tokens = await _authenticationService.RefreshTokenAsync(userTokensDTO);
+
+            return Ok(tokens);
+        }
+
+        [HttpPut]
+        [Route("password")]
+        public async Task<IActionResult> ResetPasswordAsync([FromBody] UserChangePasswordDTO userChangePasswordDTO)
+        {
+            await _authenticationService.ResetPasswordAsync(userChangePasswordDTO);
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("signin-google")]
+        public async Task<IActionResult> ExternalLoginAsync([FromBody] UserExternalAuthDTO authDTO)
+        {
+            var result = await _authenticationService.ExternalLoginAsync(authDTO);
+            return Ok(result);
         }
     }
 }
