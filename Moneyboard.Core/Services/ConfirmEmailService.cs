@@ -7,9 +7,7 @@ using Moneyboard.Core.Helpers.Mails;
 using Moneyboard.Core.Helpers.Mails.ViewModels;
 using Moneyboard.Core.Interfaces.Services;
 using Moneyboard.Core.Resources;
-using System;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Moneyboard.Core.Services
 {
@@ -61,7 +59,7 @@ namespace Moneyboard.Core.Services
 
             var result = await _userManager.ConfirmEmailAsync(user, decodedCode);
 
-            if(!result.Succeeded)
+            if (!result.Succeeded)
             {
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest,
                     ErrorMessages.ConfirmEmailInvalidCode);
@@ -87,7 +85,7 @@ namespace Moneyboard.Core.Services
         {
             var bytes = new Span<byte>(new byte[input.Length]);
 
-            if(!Convert.TryFromBase64String(input, bytes, out var bytesWritten))
+            if (!Convert.TryFromBase64String(input, bytes, out var bytesWritten))
             {
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest,
                     ErrorMessages.ConfirmEmailInvalidCode);

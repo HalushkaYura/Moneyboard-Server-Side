@@ -30,10 +30,7 @@ namespace Moneyboard.Core.Entities.UserEntity
                 .IsRequired()
                 .HasMaxLength(50);
                 
-            builder
-                .Property (x => x.Email)
-                .IsRequired ()
-                .HasMaxLength(50);
+
 
             builder
                 .Property(x => x.CardNumber)

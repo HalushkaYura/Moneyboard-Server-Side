@@ -5,6 +5,7 @@ using Moneyboard.Core.Entities.UserEntity;
 using Moneyboard.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Moneyboard.Infrastructure.Data.Repositories;
+using Google;
 
 namespace Moneyboard.Infrastructure
 {
@@ -18,7 +19,7 @@ namespace Moneyboard.Infrastructure
 
         public static void AddDbContext(this IServiceCollection services, string connectionString)
         {
-            services.AddDbContext<MoneyboardDb>(x => x.UseSqlServer(connectionString));
+            services.AddDbContext<MoneyboardDb>(options => options.UseSqlServer(connectionString));
         }
 
         public static void AddIdentityDbContext(this IServiceCollection services)

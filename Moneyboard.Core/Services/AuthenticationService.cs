@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Moneyboard.Core.DTO.UserDTO;
 using Moneyboard.Core.Entities.RefreshTokenEntity;
@@ -54,8 +55,8 @@ namespace Moneyboard.Core.Services
         //------------------------------ LOGIN ---------------------------------------
         public async Task<UserAutorizationDTO> LoginAsync(string email, string password)
         {
-            var user = await _userManager.FindByNameAsync(email);
-            if (user == null && !await _userManager.CheckPasswordAsync(user, password))
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null || !await _userManager.CheckPasswordAsync(user, password))
             {
                 throw new HttpException(System.Net.HttpStatusCode.Unauthorized, ErrorMessages.IncorrectLoginOrPassword);
             }
@@ -269,5 +270,12 @@ namespace Moneyboard.Core.Services
             return tokens;
         }
 
+
+
+        public async Task<bool> GetAllUserEmailsAsync(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            return user != null;
+        }
     }
 }

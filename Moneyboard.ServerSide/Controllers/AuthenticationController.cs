@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Moneyboard.Core.DTO.UserDTO;
 using Moneyboard.Core.Entities.UserEntity;
 using Moneyboard.Core.Interfaces.Services;
@@ -54,7 +55,7 @@ namespace Moneyboard.ServerSide.Controllers
             await _authenticationService.LogoutAsync(userTokensDTO);
 
             return NoContent();
-        }
+        } 
 
 
         [HttpGet]
@@ -64,6 +65,14 @@ namespace Moneyboard.ServerSide.Controllers
             await _authenticationService.SentResetPasswordTokenAsync(email);
 
             return Ok();
+        }
+
+        [HttpGet("emails")]
+        public async Task<IActionResult> GetEmails([FromQuery] string email)
+        {
+            bool emails = await _authenticationService.GetAllUserEmailsAsync(email);
+
+            return Ok(emails);
         }
 
         [HttpPost]

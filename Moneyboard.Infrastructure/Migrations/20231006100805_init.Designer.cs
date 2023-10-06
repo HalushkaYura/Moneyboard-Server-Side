@@ -12,7 +12,7 @@ using Moneyboard.Infrastructure.Data;
 namespace Moneyboard.Infrastructure.Migrations
 {
     [DbContext(typeof(MoneyboardDb))]
-    [Migration("20231004142547_init")]
+    [Migration("20231006100805_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -304,9 +304,8 @@ namespace Moneyboard.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");

@@ -13,6 +13,6 @@ namespace Moneyboard.Core.Interfaces.Services
         Task SentResetPasswordTokenAsync(string userEmail);
         Task ResetPasswordAsync(UserChangePasswordDTO userChangePasswordDTO);
         Task<UserAuthResponseDTO> ExternalLoginAsync(UserExternalAuthDTO authDTO);
-
+        Task<bool> GetAllUserEmailsAsync(string email);
     }
 }
