@@ -26,6 +26,7 @@ namespace Moneyboard.ServerSide
             services.AddCustomServices();
             services.AddFluentValitation();
             services.AddAuthentication();
+            services.AddSwagger();
 
             //services.ConfigureImageSettings(Configuration);
 

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Moneyboard.Core.DTO.UserDTO;
@@ -12,11 +14,12 @@ using Moneyboard.Core.Interfaces.Services;
 using Moneyboard.Core.Resources;
 using Moneyboard.Core.Roles;
 using System.Net;
+using System.Security.Claims;
 using System.Text;
 
 namespace Moneyboard.Core.Services
 {
-    public class AuthenticationService : Interfaces.Services.IAuthenticationService
+    public class AuthenticationService :IAuthenticationService
 
     {
         protected readonly UserManager<User> _userManager;
@@ -28,6 +31,7 @@ namespace Moneyboard.Core.Services
         protected readonly IConfirmEmailService _confirmEmailService;
         protected readonly ITemplateService _templateService;
         protected readonly IOptions<ClientUrl> _clientUrl;
+        protected readonly IHttpContextAccessor _httpContextAccessor;
 
         public AuthenticationService(
             UserManager<User> userManager,
@@ -38,7 +42,8 @@ namespace Moneyboard.Core.Services
             IEmailSenderService emailSenderService,
             IConfirmEmailService confirmEmailService,
             ITemplateService templateService,
-            IOptions<ClientUrl> options)
+            IOptions<ClientUrl> options,
+            IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -49,6 +54,7 @@ namespace Moneyboard.Core.Services
             _confirmEmailService = confirmEmailService;
             _templateService = templateService;
             _clientUrl = options;
+            IHttpContextAccessor _httpContextAccessor;
         }
 
 
@@ -56,14 +62,19 @@ namespace Moneyboard.Core.Services
         public async Task<UserAutorizationDTO> LoginAsync(string email, string password)
         {
             var user = await _userManager.FindByEmailAsync(email);
+
             if (user == null || !await _userManager.CheckPasswordAsync(user, password))
             {
                 throw new HttpException(System.Net.HttpStatusCode.Unauthorized, ErrorMessages.IncorrectLoginOrPassword);
             }
 
+            if (await _userManager.GetTwoFactorEnabledAsync(user))
+            {
+                return await GenerateTwoStepVerificationCode(user);
+            }
+
             return await GenerateUserTokens(user);
         }
-
 
         //------------------------------ LOGOUT ---------------------------------------
         public async Task LogoutAsync(UserAutorizationDTO userTokensDTO)
@@ -105,8 +116,6 @@ namespace Moneyboard.Core.Services
 
             await _userManager.AddToRoleAsync(user, roleName);
         }
-
-
 
         //------------------------------ SentResetPassword ---------------------------------------
         public async Task SentResetPasswordTokenAsync(string userEmail)
@@ -212,6 +221,85 @@ namespace Moneyboard.Core.Services
         }
 
 
+        private async Task<UserAutorizationDTO> GenerateTwoStepVerificationCode(User user)
+        {
+            var providers = await _userManager.GetValidTwoFactorProvidersAsync(user);
+
+            if (!providers.Contains("Email"))
+            {
+                throw new HttpException(System.Net.HttpStatusCode.Unauthorized, ErrorMessages.Invalid2StepVerification);
+            }
+
+            var twoFactorToken = await _userManager.GenerateTwoFactorTokenAsync(user, "Email");
+            var message = new MailRequest
+            {
+                ToEmail = user.Email,
+                Subject = "Moneyboard authentication code",
+                Body = await _templateService.GetTemplateHtmlAsStringAsync("Mails/TwoFactorCode",
+                    new UserToken() { Token = twoFactorToken, UserName = user.UserName, Uri = _clientUrl.Value.ApplicationUrl })
+            };
+
+            await _emailSenderService.SendEmailAsync(message);
+
+            return new UserAutorizationDTO() { Is2StepVerificationRequired = true, Provider = "Email" };
+        }
+
+
+        //------------------------------   EditUserDate ---------------------------------------
+        public async Task EditUserDateAsync(UserEditDTO userEditDTO)
+        {
+
+            var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                // Якщо користувача не знайдено, можливо, ви можете виконати обробку помилки
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
+            }
+
+            user.UserName = userEditDTO.Username;
+            user.CardNumber = userEditDTO.CardNumber;
+            user.Firstname = userEditDTO.Firstname;
+            user.Lastname = userEditDTO.Lastname;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors.Select(e => e.Description).ToList();
+                throw new Exception($"Помилка при оновленні користувача: {string.Join(", ", errors)}");
+
+            }
+        }
+
+
+        //------------------------------  RefreshToken ---------------------------------------
+        public async Task<UserAutorizationDTO> RefreshTokenAsync(UserAutorizationDTO userTokensDTO)
+        {
+            var specification = new RefreshTokens.SearchRefreshToken(userTokensDTO.RefreshToken);
+            var refeshTokenFromDb = await _refreshTokenRepository.GetFirstBySpecAsync(specification);
+
+            if (refeshTokenFromDb == null)
+            {
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.InvalidToken);
+            }
+
+            var claims = _jwtService.GetClaimsFromExpiredToken(userTokensDTO.Token);
+            var newToken = _jwtService.CreateToken(claims);
+            var newRefreshToken = _jwtService.CreateRefreshToken();
+
+            refeshTokenFromDb.Token = newRefreshToken;
+            await _refreshTokenRepository.UpdateAsync(refeshTokenFromDb);
+            await _refreshTokenRepository.SaveChangesAsync();
+
+            var tokens = new UserAutorizationDTO()
+            {
+                Token = newToken,
+                RefreshToken = newRefreshToken
+            };
+
+            return tokens;
+        }
         private async Task<UserAutorizationDTO> GenerateUserTokens(User user)
         {
             var claims = _jwtService.SetClaims(user);
@@ -243,32 +331,6 @@ namespace Moneyboard.Core.Services
             return (string)refeshToken;
         }
 
-        public async Task<UserAutorizationDTO> RefreshTokenAsync(UserAutorizationDTO userTokensDTO)
-        {
-            var specification = new RefreshTokens.SearchRefreshToken(userTokensDTO.RefreshToken);
-            var refeshTokenFromDb = await _refreshTokenRepository.GetFirstBySpecAsync(specification);
-
-            if (refeshTokenFromDb == null)
-            {
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.InvalidToken);
-            }
-
-            var claims = _jwtService.GetClaimsFromExpiredToken(userTokensDTO.Token);
-            var newToken = _jwtService.CreateToken(claims);
-            var newRefreshToken = _jwtService.CreateRefreshToken();
-
-            refeshTokenFromDb.Token = newRefreshToken;
-            await _refreshTokenRepository.UpdateAsync(refeshTokenFromDb);
-            await _refreshTokenRepository.SaveChangesAsync();
-
-            var tokens = new UserAutorizationDTO()
-            {
-                Token = newToken,
-                RefreshToken = newRefreshToken
-            };
-
-            return tokens;
-        }
 
 
 
@@ -277,5 +339,6 @@ namespace Moneyboard.Core.Services
             var user = await _userManager.FindByEmailAsync(email);
             return user != null;
         }
+
     }
 }

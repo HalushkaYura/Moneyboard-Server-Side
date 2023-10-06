@@ -1,4 +1,5 @@
-﻿using Moneyboard.Core.DTO.UserDTO;
+﻿using Microsoft.AspNetCore.Mvc;
+using Moneyboard.Core.DTO.UserDTO;
 using Moneyboard.Core.Entities.UserEntity;
 
 namespace Moneyboard.Core.Interfaces.Services
@@ -7,6 +8,7 @@ namespace Moneyboard.Core.Interfaces.Services
     {
         Task RegistrationAsync(User user, string password, string roleName);
         Task<UserAutorizationDTO> LoginAsync(string email, string password);
+        Task EditUserDateAsync(UserEditDTO userEditDTO);
         Task<UserAutorizationDTO> RefreshTokenAsync(UserAutorizationDTO userTokensDTO);
         Task LogoutAsync(UserAutorizationDTO userTokensDTO);
         Task<UserAutorizationDTO> LoginTwoStepAsync(UserTwoFactorDTO twoFactorDTO);

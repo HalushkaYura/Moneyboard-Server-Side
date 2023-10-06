@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -47,7 +48,7 @@ namespace Moneyboard.ServerSide.Controllers
 
             return Ok(tokens);
         }
-
+        [Authorize]
         [HttpPost]
         [Route("logout")]
         public async Task<IActionResult> LogoutAsync([FromBody] UserAutorizationDTO userTokensDTO)
@@ -55,18 +56,18 @@ namespace Moneyboard.ServerSide.Controllers
             await _authenticationService.LogoutAsync(userTokensDTO);
 
             return NoContent();
-        } 
+        }
 
-
+        [Authorize]
         [HttpGet]
         [Route("password/{email}")]
-        public async Task<IActionResult> SentResetPasswordTokenAsync(string email)
+        public async Task<IActionResult> SentResetPasswordTokenAsync(  string email)
         {
             await _authenticationService.SentResetPasswordTokenAsync(email);
 
             return Ok();
         }
-
+        [Authorize]
         [HttpGet("emails")]
         public async Task<IActionResult> GetEmails([FromQuery] string email)
         {
@@ -74,7 +75,7 @@ namespace Moneyboard.ServerSide.Controllers
 
             return Ok(emails);
         }
-
+        [Authorize]
         [HttpPost]
         [Route("login-two-step")]
         public async Task<IActionResult> LoginTwoStepAsync([FromBody] UserTwoFactorDTO twoFactorDTO)
@@ -83,7 +84,7 @@ namespace Moneyboard.ServerSide.Controllers
 
             return Ok(tokens);
         }
-
+        [Authorize]
         [HttpPost]
         [Route("refresh-token")]
         public async Task<IActionResult> RefreshTokenAsync([FromBody] UserAutorizationDTO userTokensDTO)
@@ -92,7 +93,7 @@ namespace Moneyboard.ServerSide.Controllers
 
             return Ok(tokens);
         }
-
+        [Authorize]
         [HttpPut]
         [Route("password")]
         public async Task<IActionResult> ResetPasswordAsync([FromBody] UserChangePasswordDTO userChangePasswordDTO)
@@ -101,7 +102,7 @@ namespace Moneyboard.ServerSide.Controllers
 
             return Ok();
         }
-
+        [Authorize]
         [HttpPost]
         [Route("signin-google")]
         public async Task<IActionResult> ExternalLoginAsync([FromBody] UserExternalAuthDTO authDTO)
