@@ -8,7 +8,7 @@ namespace Moneyboard.Core.Entities.BankCardEntity
         public int BankCardId { get; set; }
         public string CandNumber { get; set; }
         public DateTime ExpirationDate { get; set; }
-        public string CardVerificationValue { get; set; }
+        public int CardVerificationValue { get; set; }
 
         public double Money { get; set; }
 
