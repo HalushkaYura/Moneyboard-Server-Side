@@ -12,26 +12,18 @@ namespace Moneyboard.ServerSide
     {
         public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-
             services.AddControllers();
             services.AddDbContext(configuration.GetConnectionString("DefaultConnection"));
             services.AddIdentityDbContext();
             services.AddAuthentication();
-            services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.Configure<JwtOptions>(configuration.GetSection("JwtOptions"));
-            services.AddScoped<ITemplateService, TemplateService>();
-            services.AddScoped<IEmailSenderService, EmailSenderService>();
-            services.AddScoped<IConfirmEmailService, ConfirmEmailService>();
             services.AddRepositories();
             services.AddCustomServices();
             services.AddFluentValitation();
             services.AddAuthentication();
             services.AddSwagger();
-
-            //services.ConfigureImageSettings(Configuration);
-
-            //services.AddAutoMapper();
-
+            services.ConfigureImageSettings(configuration);
+            services.AddAutoMapper();
             services.AddJwtAuthentication(configuration);
             services.AddCors();
             services.AddMvcCore().AddRazorViewEngine();

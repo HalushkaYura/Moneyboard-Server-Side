@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Moneyboard.Core.Helpers
 {
-    public enum Currency
+    public enum CurrencyType
     {
         USD,
+        UAH,
         EUR,
         GBP,
         JPY,

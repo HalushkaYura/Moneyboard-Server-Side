@@ -1,6 +1,7 @@
 ﻿using Ardalis.Specification;
 using Ardalis.Specification.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Moneyboard.Core.Entities.BankCardEntity;
 using Moneyboard.Core.Interfaces;
 using Moneyboard.Core.Interfaces.Repository;
 
@@ -36,7 +37,18 @@ namespace Moneyboard.Infrastructure.Data.Repositories
         {
             return await _dbSet.FindAsync(key);
         }
-
+        public async Task<BankCard> GetByCardNumberAsync(string cardNumber)
+        {
+            if (typeof(TEntity) == typeof(BankCard))
+            {
+                var bankCardEntity = await _dbSet.SingleOrDefaultAsync(x => ((BankCard)(object)x).CardNumber == cardNumber);
+                return bankCardEntity as BankCard;
+            }
+            else
+            {
+                throw new ArgumentException("GetByCardNumberAsync can only be used with BankCard entities.");
+            }
+        }
         public async Task<TEntity> GetByPairOfKeysAsync<TFirstKey, TSecondKey>
             (TFirstKey firstKey, TSecondKey secondKey)
         {

@@ -1,5 +1,6 @@
 ﻿using Moneyboard.Core.Entities.ProjectEntity;
 using Moneyboard.Core.Entities.UserProjectEntity;
+using Moneyboard.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Moneyboard.Core.Entities.RoleEntity
 {
-    public class Role
+    public class Role :IBaseEntity
     {
         public int RoleId { get; set; }
         public string RoleName { get; set; }

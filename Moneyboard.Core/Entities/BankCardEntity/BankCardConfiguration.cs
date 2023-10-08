@@ -11,7 +11,7 @@ namespace Moneyboard.Core.Entities.BankCardEntity
                 .HasKey(x => x.BankCardId);
 
             builder
-                .Property(x => x.CandNumber)
+                .Property(x => x.CardNumber)
                 .IsRequired()
                 .HasMaxLength(16);
 

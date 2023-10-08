@@ -8,9 +8,9 @@ namespace Moneyboard.Core.DTO.ProjectDTO
         public double Salary { get; set; }
         public DateTime SalaryDate { get; set; }
         public string NumberCard { get; set; }
-        public int CVV { get; set; }
-        public DateTime MyPropertyExpirationDate { get; set; }
-        public double Maney { get; set; }
-        public Currency SelectedCurrency { get; set; }
+        public string CVV { get; set; }
+        public DateTime ExpirationDate { get; set; }
+        public double Money { get; set; }
+        public CurrencyType SelectedCurrency { get; set; }
     }
 }

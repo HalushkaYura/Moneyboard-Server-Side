@@ -9,14 +9,10 @@ using Moneyboard.Core.Exeptions;
 using Moneyboard.Core.Helpers;
 using Moneyboard.Core.Interfaces.Services;
 using Moneyboard.Core.Resources;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 namespace Moneyboard.Core.Services
 {
     public class JwtService : IJwtService

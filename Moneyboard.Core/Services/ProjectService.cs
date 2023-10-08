@@ -1,31 +1,65 @@
-﻿using Moneyboard.Core.DTO.ProjectDTO;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
+using Moneyboard.Core.DTO.ProjectDTO;
+using Moneyboard.Core.Entities.BankCardEntity;
 using Moneyboard.Core.Entities.ProjectEntity;
+using Moneyboard.Core.Interfaces.Repository;
 using Moneyboard.Core.Interfaces.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Moneyboard.Core.Services
 {
-  /*  public class ProjectService : IProjectService
+    public class ProjectService : IProjectService
     {
-        public ProjectService()
+        protected readonly IMapper _mapper;
+        protected IRepository<Project> _projectRepository;
+        protected IRepository<BankCard> _bankCardRepository;
+        protected readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IProjectContext _projectContext;
+
+
+        public ProjectService(
+            IMapper mapper,
+            IHttpContextAccessor httpContextAccessor,
+            IRepository<Project> projectRepository,
+            IRepository<BankCard> bankCardRepository, IProjectContext projectContext)
         {
+            _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
+            _projectRepository = projectRepository;
+            _bankCardRepository = bankCardRepository;
+            _projectContext = projectContext;
         }
 
-        public Task CreateProjectAsync(ProjectCreateDTO projectDTO)
+        async Task IProjectService.CreateProjectAsync(ProjectCreateDTO projectDTO)
         {
-            var project = new Project
+
+
+            if (await _bankCardRepository.GetByCardNumberAsync(projectDTO.NumberCard) == null)
             {
-                
-                project.Name = projectDTO.Name,
-                CardNumber = projectDTO.CardNumber,
-                Currency = projectDTO.SelectedCurrency,
-                CreatedAt = DateTime.UtcNow
-            };
+                var bankcard = _mapper.Map<BankCard>(projectDTO);
+                var project = _mapper.Map<Project>(projectDTO);
+
+                project.BankCard = bankcard;
+                await _bankCardRepository.AddAsync(bankcard);
+                await _projectRepository.AddAsync(project);
+            }
+            else
+            {
+                var project = _mapper.Map<Project>(projectDTO);
+                project.BankCard = await _bankCardRepository.GetByCardNumberAsync(projectDTO.NumberCard);
+                await _projectRepository.AddAsync(project);
+            }
+
+
+            await _projectRepository.SaveChangesAsync();
+            await _bankCardRepository.SaveChangesAsync();
 
         }
-    }*/
+
+        public void CreateRoleInActiveProject(string roleName)
+        {
+            int activeProjectId = _projectContext.ActiveProjectId;
+
+        }
+    }
 }

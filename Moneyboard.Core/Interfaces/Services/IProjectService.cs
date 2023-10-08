@@ -6,6 +6,5 @@ namespace Moneyboard.Core.Interfaces.Services
     public interface IProjectService
     {
         Task CreateProjectAsync(ProjectCreateDTO projectDTO);
-
     }
 }

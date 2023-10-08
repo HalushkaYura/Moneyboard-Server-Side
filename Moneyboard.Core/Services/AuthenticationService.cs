@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Moneyboard.Core.DTO.UserDTO;
 using Moneyboard.Core.Entities.RefreshTokenEntity;
 using Moneyboard.Core.Entities.UserEntity;
-using Moneyboard.Core.Exceptions;
+using Moneyboard.Core.Exeptions;
 using Moneyboard.Core.Helpers.Mails;
 using Moneyboard.Core.Helpers.Mails.ViewModels;
 using Moneyboard.Core.Interfaces.Repository;
@@ -14,12 +12,11 @@ using Moneyboard.Core.Interfaces.Services;
 using Moneyboard.Core.Resources;
 using Moneyboard.Core.Roles;
 using System.Net;
-using System.Security.Claims;
 using System.Text;
 
 namespace Moneyboard.Core.Services
 {
-    public class AuthenticationService :IAuthenticationService
+    public class AuthenticationService : IAuthenticationService
 
     {
         protected readonly UserManager<User> _userManager;
@@ -245,33 +242,6 @@ namespace Moneyboard.Core.Services
         }
 
 
-        //------------------------------   EditUserDate ---------------------------------------
-        public async Task EditUserDateAsync(UserEditDTO userEditDTO)
-        {
-
-            var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = await _userManager.FindByIdAsync(userId);
-
-            if (user == null)
-            {
-                // Якщо користувача не знайдено, можливо, ви можете виконати обробку помилки
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
-            }
-
-            user.UserName = userEditDTO.Username;
-            user.CardNumber = userEditDTO.CardNumber;
-            user.Firstname = userEditDTO.Firstname;
-            user.Lastname = userEditDTO.Lastname;
-
-            var result = await _userManager.UpdateAsync(user);
-            if (!result.Succeeded)
-            {
-                var errors = result.Errors.Select(e => e.Description).ToList();
-                throw new Exception($"Помилка при оновленні користувача: {string.Join(", ", errors)}");
-
-            }
-        }
-
 
         //------------------------------  RefreshToken ---------------------------------------
         public async Task<UserAutorizationDTO> RefreshTokenAsync(UserAutorizationDTO userTokensDTO)
@@ -334,10 +304,16 @@ namespace Moneyboard.Core.Services
 
 
 
-        public async Task<bool> GetAllUserEmailsAsync(string email)
+        public async Task<User> GetAllUserEmailsAsync(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
-            return user != null;
+
+            if (user == null)
+            {
+                // Якщо користувача не знайдено, можливо, ви можете виконати обробку помилки
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
+            }
+            return user;
         }
 
     }

@@ -1,4 +1,5 @@
 ﻿using Ardalis.Specification;
+using Moneyboard.Core.Entities.BankCardEntity;
 
 namespace Moneyboard.Core.Interfaces.Repository
 {
@@ -7,6 +8,7 @@ namespace Moneyboard.Core.Interfaces.Repository
         Task<TEntity> AddAsync(TEntity entity);
         Task<IEnumerable<TEntity>> GetAllAsync();
         Task<TEntity> GetByKeyAsync<TKey>(TKey key);
+        Task<BankCard> GetByCardNumberAsync(string cardNumber);
         Task<TEntity> GetByPairOfKeysAsync<TKey, TKey1>(TKey key, TKey1 key1);
         Task UpdateAsync(TEntity entity);
         Task DeleteAsync(TEntity entity);
