@@ -5,6 +5,7 @@ using Moneyboard.Core.Interfaces.Services;
 using Moneyboard.Core.Services;
 using Moneyboard.Infrastructure;
 using Moneyboard.WebApi.ServiceExtension;
+using Newtonsoft.Json.Serialization;
 
 namespace Moneyboard.ServerSide
 {
@@ -12,6 +13,19 @@ namespace Moneyboard.ServerSide
     {
         public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
+            //ADDED
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowReactApp",
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:3000")
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
+                    });
+            });
+            //
+
             services.AddControllers();
             services.AddDbContext(configuration.GetConnectionString("DefaultConnection"));
             services.AddIdentityDbContext();
@@ -45,9 +59,16 @@ namespace Moneyboard.ServerSide
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-
+            //ADDED
+            builder.Services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore).AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
+            //
 
             var app = builder.Build();
+
+            //ADDED
+            app.UseCors(c => c.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod());
+            app.UseCors("AllowReactApp");
+            //
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
