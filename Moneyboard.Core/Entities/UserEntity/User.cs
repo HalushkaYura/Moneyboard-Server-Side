@@ -1,18 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Moneyboard.Core.Entities.RefreshTokenEntity;
-using Moneyboard.Core.Entities.RefreshTokenEntity;
 using Moneyboard.Core.Entities.UserProjectEntity;
 using Moneyboard.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Moneyboard.Core.Entities.UserEntity
 {
-    public class User :IdentityUser , IBaseEntity
+    public class User : IdentityUser, IBaseEntity
     {
         public string Firstname { get; set; }
         public string Lastname { get; set; }

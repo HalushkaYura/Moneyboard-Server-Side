@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Moneyboard.Core.DTO.ProjectDTO;
+using Moneyboard.Core.DTO.RoleDTO;
 using Moneyboard.Core.Entities.BankCardEntity;
 using Moneyboard.Core.Entities.ProjectEntity;
+using Moneyboard.Core.Entities.RoleEntity;
 using Moneyboard.Core.Interfaces.Repository;
 using Moneyboard.Core.Interfaces.Services;
 
@@ -15,22 +17,26 @@ namespace Moneyboard.Core.Services
         protected IRepository<BankCard> _bankCardRepository;
         protected readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IProjectContext _projectContext;
+        private readonly IRoleService _roleService;
 
 
         public ProjectService(
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
             IRepository<Project> projectRepository,
-            IRepository<BankCard> bankCardRepository, IProjectContext projectContext)
+            IRepository<BankCard> bankCardRepository,
+            IProjectContext projectContext,
+            IRoleService roleService)
         {
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
             _projectRepository = projectRepository;
             _bankCardRepository = bankCardRepository;
             _projectContext = projectContext;
+            _roleService = roleService;
         }
 
-        async Task IProjectService.CreateProjectAsync(ProjectCreateDTO projectDTO)
+        public async Task CreateProjectAsync(ProjectCreateDTO projectDTO)
         {
 
 
@@ -56,10 +62,8 @@ namespace Moneyboard.Core.Services
 
         }
 
-        public void CreateRoleInActiveProject(string roleName)
-        {
-            int activeProjectId = _projectContext.ActiveProjectId;
 
-        }
+
+
     }
 }

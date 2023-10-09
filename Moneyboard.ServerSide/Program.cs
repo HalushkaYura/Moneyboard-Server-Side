@@ -39,7 +39,6 @@ namespace Moneyboard.ServerSide
             services.ConfigureImageSettings(configuration);
             services.AddAutoMapper();
             services.AddJwtAuthentication(configuration);
-            services.AddCors();
             services.AddMvcCore().AddRazorViewEngine();
         }
         public static void Main(string[] args)

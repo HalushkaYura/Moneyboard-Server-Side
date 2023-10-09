@@ -33,11 +33,15 @@ namespace Moneyboard.Core.Services
         }
         public async Task CreateNewRoleAsync(RoleCreateDTO roleCreateDTO, int projectId)
         {
+            var project = await _projectRepository.GetByKeyAsync(projectId);
+            if (project == null)
+            {
+                throw new Exception("Проект з вказаним projectId не знайдено.");
+            }
             var roles= await _roleRepository.GetAllAsync();
             bool roleExists = roles.Any(r => r.RoleName == roleCreateDTO.Name && r.ProjectId == projectId);
             if (!roleExists)
             {
-                var project = await _projectRepository.GetByKeyAsync(projectId);
                 var role = _mapper.Map<Role>(roleCreateDTO);
 
                 role.Project = project;
