@@ -41,9 +41,9 @@ namespace Moneyboard.Core.Validation
                 .Matches("^[^£# “”]*$").WithMessage("{PropertyName} must not contain the following characters £ # “” or spaces.");
             
             RuleFor(user => user.CardNumber)
-                .NotEmpty()
-                .Matches("^[0-9]+$")
-                .Matches(@"^\d{16}$")
+                .NotEmpty().WithMessage("{PropertyName} is not must empty.")
+                .Matches("^[0-9]+$").WithMessage("{PropertyName} must contain only number.")
+                .Matches(@"^\d{16}$").WithMessage("{PropertyName} must be exactly 16 digits.")
                 .Must(IsValidLuhnAlgorithm).WithMessage("{PropertyName} is not a valid credit card number.");
         }
 

@@ -10,13 +10,14 @@ namespace Moneyboard.Core.Entities.UserProjectEntity
             builder.HasKey(x => x.UserProjectId);
 
             builder.Property(x => x.IsOwner)
+                
                 .IsRequired();
 
             builder.Property(x => x.MemberDate)
                 .IsRequired();
 
             builder.Property(x => x.PersonalPoints)
-                .IsRequired();
+                 .IsRequired();
 
             builder.HasOne(x => x.User)
                 .WithMany(x => x.UserProjects)

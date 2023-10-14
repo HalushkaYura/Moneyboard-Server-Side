@@ -12,6 +12,5 @@ namespace Moneyboard.Core.DTO.UserDTO
         public string Lastname { get; set; }
         public string Username { get; set; }
         public string CardNumber { get; set; }
-        public string ImageUrl { get; set; }
     }
 }

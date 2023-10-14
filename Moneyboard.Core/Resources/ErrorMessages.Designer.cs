@@ -113,16 +113,32 @@ namespace Moneyboard.Core.Resources {
                 return ResourceManager.GetString("CannotGetFileContentType", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Cannot save the file.
         /// </summary>
-        internal static string CannotSaveFile {
-            get {
+        internal static string CannotSaveFile
+        {
+            get
+            {
                 return ResourceManager.GetString("CannotSaveFile", resourceCulture);
             }
         }
-        
+        internal static string ProjectNotFound
+        {
+            get
+            {
+                return ResourceManager.GetString("ProjectNotFound", resourceCulture);
+            }
+        }
+        internal static string IncorectBankCard
+        {
+            get
+            {
+                return ResourceManager.GetString("IncorectBankCard", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Comment not found.
         /// </summary>

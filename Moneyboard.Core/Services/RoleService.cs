@@ -1,9 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Moneyboard.Core.DTO.RoleDTO;
+using Moneyboard.Core.DTO.UserDTO;
 using Moneyboard.Core.Entities.BankCardEntity;
 using Moneyboard.Core.Entities.ProjectEntity;
 using Moneyboard.Core.Entities.RoleEntity;
+using Moneyboard.Core.Entities.UserEntity;
+using Moneyboard.Core.Exeptions;
 using Moneyboard.Core.Interfaces.Repository;
 using Moneyboard.Core.Interfaces.Services;
 using ServiceStack;
@@ -31,7 +35,7 @@ namespace Moneyboard.Core.Services
             _roleRepository = roleRepository;
 
         }
-        public async Task CreateNewRoleAsync(RoleCreateDTO roleCreateDTO, int projectId)
+        public async Task CreateNewRoleAsync(int projectId,RoleCreateDTO roleCreateDTO)
         {
             var project = await _projectRepository.GetByKeyAsync(projectId);
             if (project == null)
@@ -54,6 +58,24 @@ namespace Moneyboard.Core.Services
 
             await _projectRepository.SaveChangesAsync();
             await _roleRepository.SaveChangesAsync();
+        }
+
+        public async Task EditRoleDateAsync(int roleId, RoleEditDTO roleEditDTO)
+        {
+            var role = await _roleRepository.GetByKeyAsync(roleId);
+
+            if (role == null)
+            {
+                // Якщо користувача не знайдено, можливо, ви можете виконати обробку помилки
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.FileNotExistsFmt);
+            }
+
+            role.RoleName = roleEditDTO.Name;
+            role.RolePoints = roleEditDTO.RolePoints;
+            role.CreateDate = DateTime.Now;
+
+
+            await _roleRepository.UpdateAsync(role);
         }
     }
 }

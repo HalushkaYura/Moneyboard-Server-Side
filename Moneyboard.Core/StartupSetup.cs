@@ -26,9 +26,7 @@ namespace Moneyboard.Core
             services.AddScoped<ILocaleStorageService, LocaleStorageService>();
             services.AddScoped<IProjectService, ProjectService>();
             services.AddScoped<IRoleService, RoleService>();
-            services.AddSingleton<ProjectContext>();
-            services.AddScoped<IProjectContext, ProjectContext>();
-
+            
         }
 
         /*public static void AddFileService(this IServiceCollection services, IConfiguration configuration)

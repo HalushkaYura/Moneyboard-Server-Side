@@ -94,25 +94,11 @@ namespace Moneyboard.Core.Services
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
             }
 
-            if (!string.Equals(user.UserName, userEditDTO.Username) && userEditDTO.Username != "string")
-            {
-                user.UserName = userEditDTO.Username;
-            }
+            user.UserName = userEditDTO.Username;
+            user.CardNumber = userEditDTO.CardNumber;
+            user.Firstname = userEditDTO.Firstname;
+            user.Lastname = userEditDTO.Lastname;
 
-            if (!string.Equals(user.CardNumber, userEditDTO.CardNumber) && userEditDTO.CardNumber != " " && userEditDTO.CardNumber !="")
-            {
-                user.CardNumber = userEditDTO.CardNumber;
-            }
-
-            if (!string.Equals(user.Firstname, userEditDTO.Firstname) && userEditDTO.Firstname != "string")
-            {
-                user.Firstname = userEditDTO.Firstname;
-            }
-
-            if (!string.Equals(user.Lastname, userEditDTO.Lastname) && userEditDTO.Lastname != "string")
-            {
-                user.Lastname = userEditDTO.Lastname;
-            }
 
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)

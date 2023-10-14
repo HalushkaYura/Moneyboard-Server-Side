@@ -62,7 +62,7 @@ namespace Moneyboard.Core.Services
 
             if (user == null || !await _userManager.CheckPasswordAsync(user, password))
             {
-                throw new HttpException(System.Net.HttpStatusCode.Unauthorized, ErrorMessages.IncorrectLoginOrPassword);
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.IncorrectLoginOrPassword.ToString());
             }
 
             if (await _userManager.GetTwoFactorEnabledAsync(user))
@@ -240,7 +240,6 @@ namespace Moneyboard.Core.Services
 
             return new UserAutorizationDTO() { Is2StepVerificationRequired = true, Provider = "Email" };
         }
-
 
 
         //------------------------------  RefreshToken ---------------------------------------

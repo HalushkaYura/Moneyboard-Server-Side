@@ -2,8 +2,9 @@
 
 namespace Moneyboard.Core.DTO.ProjectDTO
 {
-    public class ProjectCreateDTO
+    public class ProjectEditDTO
     {
+        public int projectId { get; set; }
         public string Name { get; set; }
         public double Salary { get; set; }
         public DateTime SalaryDate { get; set; }

@@ -12,6 +12,7 @@ namespace Moneyboard.Core.Entities.UserProjectEntity
 {
     public class UserProject : IBaseEntity
     {
+        
         public int UserProjectId { get; set; }
         public bool IsOwner { get; set; }
         public DateTime MemberDate { get; set; }

@@ -165,6 +165,9 @@
   <data name="ImageNotFound" xml:space="preserve">
     <value>Image not found</value>
   </data>
+  <data name="IncorectBankCard" xml:space="preserve">
+    <value>This bank card was not found</value>
+  </data>
   <data name="IncorrectLoginOrPassword" xml:space="preserve">
     <value>Incorrect login or password</value>
   </data>
@@ -218,6 +221,9 @@
   </data>
   <data name="PasswordIsExist" xml:space="preserve">
     <value>Password is already created</value>
+  </data>
+  <data name="ProjectNotFound" xml:space="preserve">
+    <value>Project not found</value>
   </data>
   <data name="SendInviteYourself" xml:space="preserve">
     <value>You cannot send invite to your account</value>

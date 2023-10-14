@@ -13,17 +13,21 @@
                 _userManager = manager;
 
                 RuleFor(user => user.Firstname)
+                    .NotEmpty() 
                     .Length(3, 50);
 
 
                 RuleFor(user => user.Lastname)
+                    .NotEmpty()
                     .Length(3, 50);
 
 
                 RuleFor(user => user.Username)
+                    .NotEmpty()
                     .Must(IsUniqueUserName).WithMessage("{PropertyName} already exists.");
 
                 RuleFor(user => user.CardNumber)
+                  .NotEmpty()
                   .Matches("^[0-9]+$").When(user => !string.IsNullOrWhiteSpace(user.CardNumber))
                   .Matches(@"^\d{16}$").When(user => !string.IsNullOrWhiteSpace(user.CardNumber))
                   .Must(IsValidLuhnAlgorithm).WithMessage("{PropertyName} is not a valid credit card number.")

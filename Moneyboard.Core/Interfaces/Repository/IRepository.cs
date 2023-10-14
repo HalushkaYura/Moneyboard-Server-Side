@@ -15,6 +15,7 @@ namespace Moneyboard.Core.Interfaces.Repository
         Task<int> SaveChangesAsync();
         Task AddRangeAsync(List<TEntity> entities);
         Task<TEntity> GetFirstBySpecAsync(ISpecification<TEntity> specification);
+        Task<BankCard> GetBankCardByProjectIdAsync(int projectId);
         //Task DeleteRangeAsync(IEnumerable<TEntity> entities);
         //IQueryable<TEntity> Query(params Expression<Func<TEntity, object>>[] includes);
         //Task<int> SqlQuery(string sqlQuery);

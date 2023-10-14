@@ -65,7 +65,7 @@ namespace Moneyboard.ServerSide
             var app = builder.Build();
 
             //ADDED
-            app.UseCors(c => c.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod());
+            app.UseCors(x => x.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod());
             app.UseCors("AllowReactApp");
             //
 

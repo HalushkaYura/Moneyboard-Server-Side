@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moneyboard.Core.DTO.UserDTO;
-using Moneyboard.Core.Entities.UserEntity;
 using Moneyboard.Core.Interfaces.Services;
 using System.Security.Claims;
 
@@ -20,9 +18,18 @@ namespace Moneyboard.ServerSide.Controllers
             _userService = userService;
         }
 
+        [HttpPut]
+        [Authorize]
+        [Route("image")]
+        public async Task<IActionResult> UpdateImageAsync([FromForm] UserUploadImageDTO uploadImage)
+        {
+            await _userService.UpdateUserImageAsync(uploadImage.Image, UserId);
+
+            return Ok();
+        }
 
         [Authorize]
-        [HttpPost]
+        [HttpPut]
         [Route("edit")]
         public async Task<IActionResult> EditUserDateAsync([FromBody] UserEditDTO userEditDTO)
         {
@@ -33,7 +40,7 @@ namespace Moneyboard.ServerSide.Controllers
 
         [Authorize]
         [HttpGet]
-        [Route("Info")]
+        [Route("info")]
         public async Task<IActionResult> UserPersonalIngoAsync()
         {
             var userInfo = await _userService.GetUserPersonalInfoAsync(UserId);

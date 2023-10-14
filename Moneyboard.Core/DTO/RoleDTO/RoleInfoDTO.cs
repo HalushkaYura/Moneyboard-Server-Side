@@ -6,12 +6,9 @@ using System.Threading.Tasks;
 
 namespace Moneyboard.Core.DTO.RoleDTO
 {
-    public class RoleCreateDTO
+    public class RoleInfoDTO
     {
         public string Name { get; set; }
         public int RolePoints { get; set; }
-        public int projectId { get; set; }
-
-        //public int ProjectId { get; set; }
     }
 }
