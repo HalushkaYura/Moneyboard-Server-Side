@@ -22,9 +22,9 @@
                     .Length(3, 50);
 
 
-                RuleFor(user => user.Username)
+                /*RuleFor(user => user.Email)
                     .NotEmpty()
-                    .Must(IsUniqueUserName).WithMessage("{PropertyName} already exists.");
+                    .Must(IsUniqueEmail).WithMessage("{PropertyName} already exists.");*/
 
                 RuleFor(user => user.CardNumber)
                   .NotEmpty()
@@ -34,11 +34,11 @@
                   .When(user => !string.IsNullOrWhiteSpace(user.CardNumber));
             }
 
-            private bool IsUniqueUserName(string email)
+            /*private bool IsUniqueEmail(string email)
             {
                 var userObject = _userManager.FindByNameAsync(email).Result;
                 return userObject == null;
-            }
+            }*/
 
 
             private bool IsValidLuhnAlgorithm(string cardNumber)

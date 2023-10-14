@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace Moneyboard.Core.Interfaces.Repository
 {
-   /*public interface IBankCardRepository
+   public interface IBankCardRepository
     {
         Task<BankCard> GetBankCardByProjectIdAsync(int projectId);
         Task<BankCard> GetByCardNumberAsync(string cardNumber);
 
-    }*/
+    }
 }

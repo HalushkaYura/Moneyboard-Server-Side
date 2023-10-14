@@ -16,10 +16,9 @@ namespace Moneyboard.Infrastructure
         public static void AddRepositories(this IServiceCollection services)
         {
             services.AddScoped(typeof(Moneyboard.Core.Interfaces.Repository.IRepository<>), typeof(BaseRepository<>));
-           // services.AddScoped(typeof(Moneyboard.Core.Interfaces.Repository.IBankCardRepository), typeof(BankCardRepository));
-            services.AddScoped(typeof(Moneyboard.Core.Interfaces.Repository.IUserProjectRepository), typeof(UserProjectRepository));
 
         }
+    
 
         public static void AddDbContext(this IServiceCollection services, string connectionString)
         {

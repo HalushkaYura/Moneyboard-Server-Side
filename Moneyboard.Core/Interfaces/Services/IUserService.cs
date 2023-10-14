@@ -11,9 +11,8 @@ namespace Moneyboard.Core.Interfaces.Services
 {
     public interface IUserService
     {
-        Task<UserPersonalInfoDTO> GetUserPersonalInfoAsync(string userId);
+        Task<UserChangeInfoDTO> ChangeInfoAsync(string userId);
         Task EditUserDateAsync(UserEditDTO userEditDTO, string userId);
-        Task ChangeInfoAsync(string userId, UserChangeInfoDTO userChangeInfoDTO);
         //Task<List<UserInviteInfoDTO>> GetUserInviteInfoListAsync(string userId);
         //Task<UserActiveInviteDTO> IsActiveInviteAsync(string userId);
         Task ChangeTwoFactorVerificationStatusAsync(string userId, UserChange2faStatusDTO statusDTO);

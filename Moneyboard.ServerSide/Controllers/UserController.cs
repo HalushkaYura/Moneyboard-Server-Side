@@ -29,6 +29,28 @@ namespace Moneyboard.ServerSide.Controllers
         }
 
         [Authorize]
+        [HttpGet]
+        [Route("image")]
+        public async Task<FileResult> GetUserImageAsync()
+        {
+            //We don't use IDisposable.Dispose here from type DownloadFile
+            //because it will invoke from FileStreamResult
+            var file = await _userService.GetUserImageAsync(UserId);
+
+            return File(file.Content, file.ContentType, file.Name);
+        }
+        
+        [HttpGet]
+        [Authorize]
+        [Route("image/user/{userId}")]
+        public async Task<FileResult> GetImageAsync(string userId)
+        {
+            var file = await _userService.GetUserImageAsync(userId);
+
+            return File(file.Content, file.ContentType, file.Name);
+        }
+
+        [Authorize]
         [HttpPut]
         [Route("edit")]
         public async Task<IActionResult> EditUserDateAsync([FromBody] UserEditDTO userEditDTO)
@@ -43,7 +65,7 @@ namespace Moneyboard.ServerSide.Controllers
         [Route("info")]
         public async Task<IActionResult> UserPersonalIngoAsync()
         {
-            var userInfo = await _userService.GetUserPersonalInfoAsync(UserId);
+            var userInfo = await _userService.ChangeInfoAsync(UserId);
 
             return Ok(userInfo);
         }

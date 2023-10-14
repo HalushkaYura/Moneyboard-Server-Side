@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Moneyboard.Core.DTO.ProjectDTO;
 using Moneyboard.Core.Entities.BankCardEntity;
 using Moneyboard.Core.Entities.ProjectEntity;
@@ -29,8 +30,9 @@ namespace Moneyboard.Core.Services
             IRepository<BankCard> bankCardBaseRepository,
             IRoleService roleService,
             IRepository<User> userRepository,
-            IRepository<UserProject> userProjectRepository)
-            //IBankCardRepository bankCardRepository)
+            IRepository<UserProject> userProjectRepository
+                                                    //IBankCardRepository bankCardRepository
+                                                    )
         {
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
@@ -48,57 +50,77 @@ namespace Moneyboard.Core.Services
 
             if (user == null)
             {
-                // Обробка помилки, якщо користувача не знайдено
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest,
-                                  ErrorMessages.UserNotFound);
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
             }
-
+            var bankcard = _mapper.Map<BankCard>(projectDTO);
+            var project = _mapper.Map<Project>(projectDTO);
             if (await _bankCardBaseRepository.GetByCardNumberAsync(projectDTO.NumberCard) == null)
             {
-                var bankcard = _mapper.Map<BankCard>(projectDTO);
-                var project = _mapper.Map<Project>(projectDTO);
-
                 project.BankCard = bankcard;
                 await _bankCardBaseRepository.AddAsync(bankcard);
-                await _projectRepository.AddAsync(project);
-
-                // Створюємо об'єкт UserProject та прив'язуємо його до користувача та проекту
-                var userProject = new UserProject
-                {
-                    IsOwner = true, // Позначаємо користувача як власника проекту
-                    MemberDate = DateTime.Now,
-                    PersonalPoints = 0, // Якщо потрібно вказати якісь особисті бали користувача
-                    UserId = userId, // ID користувача, який створив проект
-                    Project = project // Прив'язуємо до проекту
-                };
-
-                await _userProjectRepository.AddAsync(userProject);
             }
             else
             {
-                var project = _mapper.Map<Project>(projectDTO);
                 project.BankCard = await _bankCardBaseRepository.GetByCardNumberAsync(projectDTO.NumberCard);
-                await _projectRepository.AddAsync(project);
-
-                // Створюємо об'єкт UserProject та прив'язуємо його до користувача та проекту
-                var userProject = new UserProject
-                {
-                    IsOwner = true, // Позначаємо користувача як власника проекту
-                    MemberDate = DateTime.Now,
-                    PersonalPoints = 0, // Якщо потрібно вказати якісь особисті бали користувача
-                    UserId = userId, // ID користувача, який створив проект
-                    Project = project // Прив'язуємо до проекту
-                };
-
-                await _userProjectRepository.AddAsync(userProject);
             }
+            await _projectRepository.AddAsync(project);
+
+            // Створюємо об'єкт UserProject та прив'язуємо його до користувача та проекту
+            var userProject = new UserProject
+            {
+                IsOwner = true, // Позначаємо користувача як власника проекту
+                MemberDate = DateTime.Now,
+                PersonalPoints = 0, // Якщо потрібно вказати якісь особисті бали користувача
+                UserId = userId, // ID користувача, який створив проект
+                Project = project // Прив'язуємо до проекту
+            };
+            await _userProjectRepository.AddAsync(userProject);
 
             await _projectRepository.SaveChangesAsync();
             await _bankCardBaseRepository.SaveChangesAsync();
             await _userProjectRepository.SaveChangesAsync();
         }
 
+         // Надо зробити для підєднання юзерів
+        public async Task AddMemberToProjectAsync(string userId, int projectId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
 
+            if (user == null)
+            {
+                // Обробка помилки, якщо користувача не знайдено
+                throw new Exception("Користувача не знайдено.");
+            }
+
+            var project = await _projectRepository.GetByKeyAsync(projectId);
+
+            if (project == null)
+            {
+                // Обробка помилки, якщо проект не знайдено
+                throw new Exception("Проект не знайдено.");
+            }
+
+            // Створення об'єкта UserProject для учасника проекту
+            var userProject = new UserProject
+            {
+                IsOwner = false, // Учасник не є власником
+                MemberDate = DateTime.Now,
+                PersonalPoints = 0, // Якщо потрібно вказати якісь особисті бали користувача
+                UserId = userId, // ID користувача, який стає учасником проекту
+                Project = project
+            };
+
+            await _userProjectRepository.AddAsync(userProject);
+
+            // Присвоєння ролі учаснику
+            await _userManager.AddToRoleAsync(user, "Member"); // "Member" - приклад ролі для учасника
+
+            // Збереження змінень у ролях користувача
+            await _userManager.UpdateAsync(user);
+
+            await _userProjectRepository.SaveChangesAsync();
+        }
+        //
         public async Task<ProjectInfoDTO> InfoFromProjectAsync(int projectId)
         {
 
@@ -111,7 +133,6 @@ namespace Moneyboard.Core.Services
             var projectInfo = _mapper.Map<ProjectInfoDTO>(projectObject);
 
             return projectInfo;
-
         }
 
         private async Task<bool> IsProjectOwnedByUserAsync(string userId, int projectId)
@@ -150,6 +171,18 @@ namespace Moneyboard.Core.Services
 
         public Task<IEnumerable<Project>> AllUserProjectAsync(string userId)
         {
+            /*var userProjects = await _userProjectRepository.GetListAsync(up => up.UserId == userId);
+
+            // Отримайте ідентифікатори проектів
+            var projectIds = userProjects.Select(up => up.ProjectId);
+
+            // За допомогою отриманих ідентифікаторів проектів отримайте інформацію про проекти
+            var projects = await _projectRepository.GetListAsync(p => projectIds.Contains(p.ProjectId));
+
+            // Можете використовувати AutoMapper для мапування проектів в DTO
+            var projectDtos = _mapper.Map<IEnumerable<ProjectInfoDTO>>(projects);
+
+            return projectDtos;*/
             throw new NotImplementedException();
         }
     }

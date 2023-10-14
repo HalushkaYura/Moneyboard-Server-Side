@@ -16,12 +16,12 @@ namespace Moneyboard.Core.Helpers
         {
 
 
-            CreateMap<User, UserPersonalInfoDTO>()
+            CreateMap<User, UserChangeInfoDTO>()
                 .ForMember(dest => dest.Email, act => act.MapFrom(src => src.Email))
                 .ForMember(dest => dest.Firstname, act => act.MapFrom(src => src.Firstname))
                 .ForMember(dest => dest.Lastname, act => act.MapFrom(src => src.Lastname))
-                .ForMember(dest => dest.Username, act => act.MapFrom(src => src.UserName))
-                .ForMember(dest => dest.CardNumber, act => act.MapFrom(src => src.CardNumber));
+                .ForMember(dest => dest.CardNumber, act => act.MapFrom(src => src.CardNumber))
+                .ForMember(dest => dest.BirstDate, act => act.MapFrom(src => src.BirthDate));
 
             /*CreateMap<InviteUser, UserInviteInfoDTO>()
                 .ForMember(x => x.Id, act => act.MapFrom(srs => srs.Id))
@@ -62,7 +62,6 @@ namespace Moneyboard.Core.Helpers
 
 
 
-            CreateMap<UserChangeInfoDTO, User>();
 
             /* CreateMap<BlobDownloadInfo, DownloadFile>()
                  .ForMember(x => x.ContentType, act => act.MapFrom(srs => srs.Details.ContentType))

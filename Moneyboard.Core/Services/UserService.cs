@@ -52,36 +52,15 @@ namespace Moneyboard.Core.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<UserPersonalInfoDTO> GetUserPersonalInfoAsync(string userId)
+        public async Task<UserChangeInfoDTO> ChangeInfoAsync(string userId)
         {
             var user = await _userRepository.GetByKeyAsync(userId);
-            var userPersonalInfo = _mapper.Map<UserPersonalInfoDTO>(user);
+            var userPersonalInfo = _mapper.Map<UserChangeInfoDTO>(user);
 
             return userPersonalInfo;
         }
 
-        public async Task ChangeInfoAsync(string userId, UserChangeInfoDTO userChangeInfoDTO)
-        {
-            var userObject = await _userManager.FindByNameAsync(userChangeInfoDTO.UserName);
 
-            if (userObject != null && userObject.Id != userId)
-            {
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest,
-                   ErrorMessages.UsernameAlreadyExists);
-            }
-
-            var user = await _userRepository.GetByKeyAsync(userId);
-
-            _mapper.Map(userChangeInfoDTO, user);
-
-            await _userRepository.UpdateAsync(user);
-
-            await _userManager.UpdateNormalizedUserNameAsync(user);
-
-            await _userRepository.SaveChangesAsync();
-
-            await Task.CompletedTask;
-        }
 
         //------------------------------   EditUserDate ---------------------------------------
         public async Task EditUserDateAsync(UserEditDTO userEditDTO, string userId)
@@ -94,7 +73,6 @@ namespace Moneyboard.Core.Services
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
             }
 
-            user.UserName = userEditDTO.Username;
             user.CardNumber = userEditDTO.CardNumber;
             user.Firstname = userEditDTO.Firstname;
             user.Lastname = userEditDTO.Lastname;
