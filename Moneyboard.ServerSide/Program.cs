@@ -83,7 +83,6 @@ namespace Moneyboard.ServerSide
 
             app.UseAuthorization();
 
-
             app.MapControllers();
 
             app.Run();
