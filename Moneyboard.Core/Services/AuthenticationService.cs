@@ -62,7 +62,7 @@ namespace Moneyboard.Core.Services
 
             if (user == null || !await _userManager.CheckPasswordAsync(user, password))
             {
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.IncorrectLoginOrPassword.ToString());
+                throw new HttpException(System.Net.HttpStatusCode.Unauthorized, ErrorMessages.IncorrectLoginOrPassword);
             }
 
             if (await _userManager.GetTwoFactorEnabledAsync(user))

@@ -33,7 +33,7 @@ namespace Moneyboard.Infrastructure.Data
 
         public DbSet<Project> Project { get; set; }
         public DbSet<BankCard> BankCard { get; set; }
-        public DbSet<RefreshToken> RefreshToken { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Role> Role { get; set; }
         public DbSet<UserProject> UserProject { get; set; }
 

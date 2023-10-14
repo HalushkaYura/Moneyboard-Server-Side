@@ -4,6 +4,7 @@ using Moneyboard.Core.Helpers;
 using Moneyboard.Core.Interfaces.Services;
 using Moneyboard.Core.Services;
 using Moneyboard.Infrastructure;
+using Moneyboard.WebApi.Middleweres;
 using Moneyboard.WebApi.ServiceExtension;
 using Newtonsoft.Json.Serialization;
 
@@ -63,6 +64,8 @@ namespace Moneyboard.ServerSide
             //
 
             var app = builder.Build();
+
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             //ADDED
             app.UseCors(x => x.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod());
