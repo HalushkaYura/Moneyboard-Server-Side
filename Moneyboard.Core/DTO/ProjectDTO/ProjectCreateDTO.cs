@@ -5,13 +5,13 @@ namespace Moneyboard.Core.DTO.ProjectDTO
     public class ProjectCreateDTO
     {
         public string Name { get; set; }
-        public double Salary { get; set; }
+        public double BaseSalary { get; set; }
         public DateTime SalaryDate { get; set; }
-        public string NumberCard { get; set; }
-        public string CVV { get; set; }
+        public string CardNumber { get; set; }
+        public string CardVerificationValue { get; set; }
         public DateTime ExpirationDate { get; set; }
         public double Money { get; set; }
-        public CurrencyType SelectedCurrency { get; set; }
+        public CurrencyType Currency { get; set; }
         public int ProjectPoinPercent { get; set; }
     }
 }

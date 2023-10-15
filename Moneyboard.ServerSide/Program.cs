@@ -43,8 +43,8 @@ namespace Moneyboard.ServerSide
             services.AddAutoMapper();
             services.AddJwtAuthentication(configuration);
             services.AddMvcCore().AddRazorViewEngine();
-            //services.AddScoped<IBankCardRepository, BankCardRepository>();
-            services.AddScoped<IUserProjectRepository, UserProjectRepository>();
+
+
         }
         public static void Main(string[] args)
         {

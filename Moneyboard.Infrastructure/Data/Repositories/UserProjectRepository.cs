@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moneyboard.Core.Entities.ProjectEntity;
+using Moneyboard.Core.Entities.UserEntity;
 using Moneyboard.Core.Entities.UserProjectEntity;
 using Moneyboard.Core.Interfaces.Repository;
+using SendGrid.Helpers.Mail;
 
 namespace Moneyboard.Infrastructure.Data.Repositories
 {
@@ -12,6 +14,8 @@ namespace Moneyboard.Infrastructure.Data.Repositories
         {
             _dbContext = dbContext;
         }
+
+
         public async Task<UserProject> GetUserProjectAsync(string userId, int projectId)
         {
             return await _dbContext.UserProject

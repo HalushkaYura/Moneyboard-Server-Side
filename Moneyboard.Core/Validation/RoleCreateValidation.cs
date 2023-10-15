@@ -12,7 +12,7 @@ namespace Moneyboard.Core.Validation
     {
         public RoleCreateValidation()
         {
-            RuleFor(dto => dto.Name)
+            RuleFor(dto => dto.RoleName)
                 .NotEmpty()
                 .MaximumLength(255);
             RuleFor(dto => dto.RolePoints)

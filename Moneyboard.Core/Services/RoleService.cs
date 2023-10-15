@@ -43,7 +43,7 @@ namespace Moneyboard.Core.Services
                 throw new Exception("Проект з вказаним projectId не знайдено.");
             }
             var roles= await _roleRepository.GetAllAsync();
-            bool roleExists = roles.Any(r => r.RoleName == roleCreateDTO.Name && r.ProjectId == projectId);
+            bool roleExists = roles.Any(r => r.RoleName == roleCreateDTO.RoleName && r.ProjectId == projectId);
             if (!roleExists)
             {
                 var role = _mapper.Map<Role>(roleCreateDTO);

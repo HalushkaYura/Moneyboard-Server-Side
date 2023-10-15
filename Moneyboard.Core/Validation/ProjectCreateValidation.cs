@@ -16,20 +16,20 @@ namespace Moneyboard.Core.Validation
                  .NotEmpty()
                  .MaximumLength(255);
 
-            RuleFor(dto => dto.Salary)
+            RuleFor(dto => dto.BaseSalary)
                 .GreaterThanOrEqualTo(6400);
 
             RuleFor(dto => dto.SalaryDate)
                 .NotEmpty();
 
-            RuleFor(dto => dto.NumberCard)
+            RuleFor(dto => dto.CardNumber)
                 .NotEmpty()
                 .Matches(@"^\d{16}$")
                 .Matches("^[0-9]+$")
                 .Must(IsValidLuhnAlgorithm).WithMessage("{PropertyName} is not a valid credit card number.");
             ;
 
-            RuleFor(dto => dto.CVV)
+            RuleFor(dto => dto.CardVerificationValue)
                 .NotEmpty()
                 .Length(3);
 
@@ -39,7 +39,7 @@ namespace Moneyboard.Core.Validation
             RuleFor(dto => dto.Money)
                 .GreaterThanOrEqualTo(10000);
 
-            RuleFor(dto => dto.SelectedCurrency)
+            RuleFor(dto => dto.Currency)
                 .IsInEnum();
         }
 

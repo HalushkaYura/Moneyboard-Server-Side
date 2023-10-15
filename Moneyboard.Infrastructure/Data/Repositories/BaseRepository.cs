@@ -6,6 +6,7 @@ using Moneyboard.Core.Entities.ProjectEntity;
 using Moneyboard.Core.Interfaces;
 using Moneyboard.Core.Interfaces.Repository;
 using SendGrid.Helpers.Mail;
+using System.Linq.Expressions;
 
 namespace Moneyboard.Infrastructure.Data.Repositories
 {
@@ -102,6 +103,34 @@ namespace Moneyboard.Infrastructure.Data.Repositories
             {
                 throw new ArgumentException("GetByCardNumberAsync can only be used with BankCard entities.");
             }
+        }
+
+
+        public async Task<IEnumerable<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = null)
+        {
+            // Створення запиту до бази даних на основі параметрів
+            IQueryable<TEntity> query = _dbContext.Set<TEntity>();
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (includeProperties != null)
+            {
+                foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeProperty);
+                }
+            }
+
+            if (orderBy != null)
+            {
+                query = orderBy(query);
+            }
+
+            // Виконання запиту та отримання результатів
+            return await query.ToListAsync();
         }
     }
 }

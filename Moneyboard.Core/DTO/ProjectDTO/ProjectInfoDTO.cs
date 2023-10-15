@@ -14,7 +14,7 @@ namespace Moneyboard.Core.DTO.ProjectDTO
         public int ProjectId { get; set; }
         public string Name { get; set; }
         public string Currency { get; set; }
-        public double Salary { get; set; }
+        public double BaseSalary { get; set; }
         public DateTime SalaryDate { get; set; }
         public List<Role> RoleInfo { get; set; }
     }

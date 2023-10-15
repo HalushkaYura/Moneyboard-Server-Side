@@ -55,12 +55,22 @@ namespace Moneyboard.ServerSide.Controllers
 
         [Authorize]
         [HttpGet]
-        [Route("allProject")]
-        public async Task<IActionResult> AllProjectOfUserAsync()
+        [Route("owner")]
+        public async Task<IActionResult> GetProjectsOwnedByUserAsync()
         {
-            var projectId = await _projectService.AllUserProjectAsync(UserId);
+            var project = await _projectService.GetProjectsOwnedByUserAsync(UserId);
 
-            return Ok(projectId);
+            return Ok(project);
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("member")]
+        public async Task<IActionResult> GetProjectsUserIsMemberAsync()
+        {
+            var project = await _projectService.GetProjectsUserIsMemberAsync(UserId);
+
+            return Ok(project);
         }
 
         [Authorize]

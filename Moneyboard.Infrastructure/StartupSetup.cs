@@ -16,7 +16,9 @@ namespace Moneyboard.Infrastructure
         public static void AddRepositories(this IServiceCollection services)
         {
             services.AddScoped(typeof(Moneyboard.Core.Interfaces.Repository.IRepository<>), typeof(BaseRepository<>));
-
+            //services.AddScoped<IBankCardRepository, BankCardRepository>();
+            services.AddScoped<IUserProjectRepository, UserProjectRepository>();
+            services.AddScoped<IProjectRepository, ProjectRepository>();
         }
     
 
