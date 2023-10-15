@@ -52,7 +52,7 @@ namespace Moneyboard.Core.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<UserChangeInfoDTO> ChangeInfoAsync(string userId)
+        public async Task<UserChangeInfoDTO> UserInfoAsync(string userId)
         {
             var user = await _userRepository.GetByKeyAsync(userId);
             var userPersonalInfo = _mapper.Map<UserChangeInfoDTO>(user);

@@ -39,7 +39,7 @@ namespace Moneyboard.ServerSide.Controllers
 
             return File(file.Content, file.ContentType, file.Name);
         }
-        
+
         [HttpGet]
         [Authorize]
         [Route("image/user/{userId}")]
@@ -65,7 +65,7 @@ namespace Moneyboard.ServerSide.Controllers
         [Route("info")]
         public async Task<IActionResult> UserPersonalIngoAsync()
         {
-            var userInfo = await _userService.ChangeInfoAsync(UserId);
+            var userInfo = await _userService.UserInfoAsync(UserId);
 
             return Ok(userInfo);
         }

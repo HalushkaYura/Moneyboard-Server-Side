@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Moneyboard.Core.DTO.ProjectDTO;
-using Moneyboard.Core.DTO.RoleDTO;
 using Moneyboard.Core.Interfaces.Services;
 using System.Security.Claims;
 
@@ -35,13 +34,14 @@ namespace Moneyboard.ServerSide.Controllers
 
         [Authorize]
         [HttpPost]
-        [Route("createRole")]
-        public async Task<IActionResult> CreateRoleAsync([FromBody] RoleCreateDTO roleCreateDTO)
+        [Route("add-member/{projectId}")]
+        public async Task<IActionResult> AddMemberToProjectAsync([FromBody] int projectId,  string userId)
         {
-            await _roleService.CreateNewRoleAsync(roleCreateDTO.projectId, roleCreateDTO);
-
+            await _projectService.AddMemberToProjectAsync(userId, projectId);
             return Ok();
         }
+
+
 
         [Authorize]
         [HttpGet]
@@ -78,15 +78,9 @@ namespace Moneyboard.ServerSide.Controllers
         [Route("edit")]
         public async Task<IActionResult> EditProject([FromBody] ProjectEditDTO projectEditDTO)
         {
-            try
-            {
-                await _projectService.EditProjectDateAsync(projectEditDTO, projectEditDTO.projectId);
-                return Ok("Проект успішно оновлено");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Помилка при оновленні проекту: {ex.Message}");
-            }
+
+            await _projectService.EditProjectDateAsync(projectEditDTO, projectEditDTO.projectId);
+            return Ok("Проект успішно оновлено");
         }
 
     }

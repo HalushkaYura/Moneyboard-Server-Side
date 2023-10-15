@@ -7,10 +7,11 @@ using Moneyboard.Core.Entities.BankCardEntity;
 using Moneyboard.Core.Entities.ProjectEntity;
 using Moneyboard.Core.Entities.RoleEntity;
 using Moneyboard.Core.Entities.UserEntity;
+using Moneyboard.Core.Entities.UserProjectEntity;
 using Moneyboard.Core.Exeptions;
 using Moneyboard.Core.Interfaces.Repository;
 using Moneyboard.Core.Interfaces.Services;
-using ServiceStack;
+using Moneyboard.Core.Resources;
 using System.Data;
 
 namespace Moneyboard.Core.Services
@@ -21,28 +22,32 @@ namespace Moneyboard.Core.Services
         protected IRepository<Project> _projectRepository;
         protected IRepository<Role> _roleRepository;
         protected readonly IHttpContextAccessor _httpContextAccessor;
-
+        protected readonly UserManager<User> _userManager;
+        protected readonly IRepository<UserProject> _userProjectRepository;
 
         public RoleService(
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
             IRepository<Project> projectRepository,
-            IRepository<Role> roleRepository)
+            IRepository<Role> roleRepository,
+            UserManager<User> userManager,
+            IRepository<UserProject> userProjectRepository)
         {
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
             _projectRepository = projectRepository;
             _roleRepository = roleRepository;
-
+            _userManager = userManager;
+            _userProjectRepository = userProjectRepository;
         }
-        public async Task CreateNewRoleAsync(int projectId,RoleCreateDTO roleCreateDTO)
+        public async Task CreateNewRoleAsync(int projectId, RoleCreateDTO roleCreateDTO)
         {
             var project = await _projectRepository.GetByKeyAsync(projectId);
             if (project == null)
             {
-                throw new Exception("Проект з вказаним projectId не знайдено.");
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
             }
-            var roles= await _roleRepository.GetAllAsync();
+            var roles = await _roleRepository.GetAllAsync();
             bool roleExists = roles.Any(r => r.RoleName == roleCreateDTO.RoleName && r.ProjectId == projectId);
             if (!roleExists)
             {
@@ -53,7 +58,7 @@ namespace Moneyboard.Core.Services
             }
             else
             {
-                throw new Exception("Така роль вже існує.");
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.FileNameAlreadyExist);
             }
 
             await _projectRepository.SaveChangesAsync();
@@ -66,8 +71,7 @@ namespace Moneyboard.Core.Services
 
             if (role == null)
             {
-                // Якщо користувача не знайдено, можливо, ви можете виконати обробку помилки
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.FileNotExistsFmt);
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Role not found.");
             }
 
             role.RoleName = roleEditDTO.Name;
@@ -77,5 +81,26 @@ namespace Moneyboard.Core.Services
 
             await _roleRepository.UpdateAsync(role);
         }
+
+        public async Task AssignRoleToProjectMemberAsync(string userId, int projectId, string roleName)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
+            }
+
+            var userProject = await _userProjectRepository.GetByPairOfKeysAsync(userId, projectId);
+
+            if (userProject == null)
+            {
+                // Обробка помилки, якщо користувач не є членом проекту
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotMember);
+            }
+
+            await _userManager.AddToRoleAsync(user, roleName);
+        }
+
     }
 }

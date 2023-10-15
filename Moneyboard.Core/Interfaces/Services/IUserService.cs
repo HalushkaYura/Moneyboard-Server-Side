@@ -11,7 +11,7 @@ namespace Moneyboard.Core.Interfaces.Services
 {
     public interface IUserService
     {
-        Task<UserChangeInfoDTO> ChangeInfoAsync(string userId);
+        Task<UserChangeInfoDTO> UserInfoAsync(string userId);
         Task EditUserDateAsync(UserEditDTO userEditDTO, string userId);
         //Task<List<UserInviteInfoDTO>> GetUserInviteInfoListAsync(string userId);
         //Task<UserActiveInviteDTO> IsActiveInviteAsync(string userId);

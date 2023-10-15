@@ -2,10 +2,8 @@
 using Ardalis.Specification.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Moneyboard.Core.Entities.BankCardEntity;
-using Moneyboard.Core.Entities.ProjectEntity;
 using Moneyboard.Core.Interfaces;
 using Moneyboard.Core.Interfaces.Repository;
-using SendGrid.Helpers.Mail;
 using System.Linq.Expressions;
 
 namespace Moneyboard.Infrastructure.Data.Repositories
@@ -89,7 +87,7 @@ namespace Moneyboard.Infrastructure.Data.Repositories
                 return project.BankCard;
             }
 
-            return null; 
+            return null;
         }
 
         public async Task<BankCard> GetByCardNumberAsync(string cardNumber)
@@ -106,7 +104,12 @@ namespace Moneyboard.Infrastructure.Data.Repositories
         }
 
 
-        public async Task<IEnumerable<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = null)
+        public async Task<IEnumerable<TEntity>> GetListAsync(
+            Expression<Func<TEntity,
+            bool>> filter = null,
+            Func<IQueryable<TEntity>,
+            IOrderedQueryable<TEntity>> orderBy = null,
+            string includeProperties = null)
         {
             // Створення запиту до бази даних на основі параметрів
             IQueryable<TEntity> query = _dbContext.Set<TEntity>();

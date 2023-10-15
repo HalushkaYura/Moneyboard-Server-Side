@@ -15,7 +15,11 @@ namespace Moneyboard.Core.Interfaces.Repository
         Task<int> SaveChangesAsync();
         Task AddRangeAsync(List<TEntity> entities);
         Task<TEntity> GetFirstBySpecAsync(ISpecification<TEntity> specification);
-        Task<IEnumerable<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = null);
+        Task<IEnumerable<TEntity>> GetListAsync(
+            Expression<Func<TEntity, bool>> filter = null,
+            Func<IQueryable<TEntity>,
+            IOrderedQueryable<TEntity>> orderBy = null,
+            string includeProperties = null);
 
         Task<BankCard> GetBankCardByProjectIdAsync(int projectId);
         Task<BankCard> GetByCardNumberAsync(string cardNumber);
