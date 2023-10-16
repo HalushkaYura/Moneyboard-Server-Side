@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Moneyboard.Core.DTO.ProjectDTO;
 using Moneyboard.Core.Entities.BankCardEntity;
 using Moneyboard.Core.Entities.ProjectEntity;
+using Moneyboard.Core.Entities.RoleEntity;
 using Moneyboard.Core.Entities.UserEntity;
 using Moneyboard.Core.Entities.UserProjectEntity;
 using Moneyboard.Core.Exeptions;
@@ -24,6 +25,7 @@ namespace Moneyboard.Core.Services
         protected readonly IRoleService _roleService;
         protected readonly IRepository<UserProject> _userProjectRepository;
         protected readonly IRepository<User> _userRepository;
+        protected readonly IRepository<Role> _roleRepository;
         protected readonly IProjectRepository _projectBaseRepository;
         protected readonly IUserProjectRepository _userProjectBaseRepository;
         public ProjectService(
@@ -33,6 +35,7 @@ namespace Moneyboard.Core.Services
             IRepository<BankCard> bankCardBaseRepository,
             IRoleService roleService,
             IRepository<User> userRepository,
+            IRepository<Role> roleRepository,
             IRepository<UserProject> userProjectRepository,
             UserManager<User> userManager,
             IProjectRepository projectBaseRepository,
@@ -50,6 +53,7 @@ namespace Moneyboard.Core.Services
             _userManager = userManager;
             _projectBaseRepository = projectBaseRepository;
             _userProjectRepository = userProjectRepository;
+            _roleRepository = roleRepository;
             //_bankCardRepository = bankCardRepository;
         }
 
@@ -76,6 +80,17 @@ namespace Moneyboard.Core.Services
             }
 
             await _projectRepository.AddAsync(project);
+            await _projectRepository.SaveChangesAsync();
+
+            var role = new Role
+            {
+                RoleName = "Owner",
+                RolePoints = 100,
+                Project = project
+
+            };
+            await _roleRepository.AddAsync(role);
+            await _roleRepository.SaveChangesAsync();
 
             var userProject = new UserProject
             {
@@ -83,15 +98,17 @@ namespace Moneyboard.Core.Services
                 MemberDate = DateTime.Now,
                 PersonalPoints = 0,
                 UserId = userId,
-                Project = project
+                Project = project,
+                Role = role
             };
 
             await _userProjectRepository.AddAsync(userProject);
+            await _userProjectRepository.SaveChangesAsync();
+
             await _userManager.AddToRoleAsync(user, "Owner");
             await _userManager.UpdateAsync(user);
-            await _projectRepository.SaveChangesAsync();
+
             await _bankCardBaseRepository.SaveChangesAsync();
-            await _userProjectRepository.SaveChangesAsync();
         }
 
         public async Task AddMemberToProjectAsync(string userId, int projectId)
@@ -109,14 +126,23 @@ namespace Moneyboard.Core.Services
             {
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
             }
+            var role = new Role
+            {
+                RoleName = "Member",
+                RolePoints = 100,
+                Project = project
 
+            };
+            await _roleRepository.AddAsync(role);
+            await _roleRepository.SaveChangesAsync();
             var userProject = new UserProject
             {
                 IsOwner = false,
                 MemberDate = DateTime.Now,
                 PersonalPoints = 0,
                 UserId = userId,
-                Project = project
+                Project = project,
+                Role = role
             };
 
             await _userProjectRepository.AddAsync(userProject);

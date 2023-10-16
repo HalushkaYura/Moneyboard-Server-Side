@@ -49,17 +49,15 @@ namespace Moneyboard.Core.Services
             }
             var roles = await _roleRepository.GetAllAsync();
             bool roleExists = roles.Any(r => r.RoleName == roleCreateDTO.RoleName && r.ProjectId == projectId);
-            if (!roleExists)
-            {
-                var role = _mapper.Map<Role>(roleCreateDTO);
-
-                role.Project = project;
-                await _roleRepository.AddAsync(role);
-            }
-            else
+            if (roleExists)
             {
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.FileNameAlreadyExist);
             }
+
+            var role = _mapper.Map<Role>(roleCreateDTO);
+
+            role.Project = project;
+            await _roleRepository.AddAsync(role);
 
             await _projectRepository.SaveChangesAsync();
             await _roleRepository.SaveChangesAsync();

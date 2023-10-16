@@ -9,8 +9,7 @@ namespace Moneyboard.Core.Entities.UserProjectEntity
         {
             builder.HasKey(x => x.UserProjectId);
 
-            builder.Property(x => x.IsOwner)
-                
+            builder.Property(x => x.IsOwner)               
                 .IsRequired();
 
             builder.Property(x => x.MemberDate)
