@@ -27,7 +27,7 @@ namespace Moneyboard.ServerSide.Controllers
         [Route("create")]
         public async Task<IActionResult> CreateRoleAsync([FromBody] RoleCreateDTO roleCreateDTO)
         {
-            await _roleService.CreateNewRoleAsync(roleCreateDTO.projectId, roleCreateDTO);
+            await _roleService.CreateNewRoleAsync(roleCreateDTO.ProjectId, roleCreateDTO);
 
             return Ok();
         }
@@ -49,6 +49,15 @@ namespace Moneyboard.ServerSide.Controllers
         {
             await _roleService.EditRoleDateAsync(roleId, roleEditDTO);
             return Ok();
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("project/{projectId}")]
+        public async Task<IActionResult> GetRolesByProjectId(int projectId)
+        {
+            var roles = await _roleService.GetRolesByProjectIdAsync(projectId);
+            return Ok(roles);
         }
     }
 }

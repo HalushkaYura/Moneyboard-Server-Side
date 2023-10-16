@@ -99,6 +99,15 @@ namespace Moneyboard.Core.Services
 
             await _userManager.AddToRoleAsync(user, roleName);
         }
+        public async Task<IEnumerable<RoleInfoDTO>> GetRolesByProjectIdAsync(int projectId)
+        {
+            // Отримайте ролі, які належать до певного проекту за його ідентифікатором (projectId)
+            var roles = await _roleRepository.GetListAsync(r => r.ProjectId == projectId);
 
+            // Мапуйте ролі на DTO об'єкти (RoleDTO)
+            var roleDtos = _mapper.Map<IEnumerable<RoleInfoDTO>>(roles);
+
+            return roleDtos;
+        }
     }
 }

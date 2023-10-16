@@ -57,6 +57,7 @@ namespace Moneyboard.Core.Services
             //_bankCardRepository = bankCardRepository;
         }
 
+   
         public async Task CreateNewProjectAsync(ProjectCreateDTO projectDTO, string userId)
         {
             var user = await _userRepository.GetByKeyAsync(userId);
@@ -73,10 +74,14 @@ namespace Moneyboard.Core.Services
             {
                 project.BankCard = bankcard;
                 await _bankCardBaseRepository.AddAsync(bankcard);
+                await _bankCardBaseRepository.SaveChangesAsync();
+
             }
             else
             {
                 project.BankCard = await _bankCardBaseRepository.GetByCardNumberAsync(projectDTO.CardNumber);
+                await _bankCardBaseRepository.SaveChangesAsync();
+
             }
 
             await _projectRepository.AddAsync(project);
@@ -104,11 +109,6 @@ namespace Moneyboard.Core.Services
 
             await _userProjectRepository.AddAsync(userProject);
             await _userProjectRepository.SaveChangesAsync();
-
-            await _userManager.AddToRoleAsync(user, "Owner");
-            await _userManager.UpdateAsync(user);
-
-            await _bankCardBaseRepository.SaveChangesAsync();
         }
 
         public async Task AddMemberToProjectAsync(string userId, int projectId)
@@ -146,8 +146,6 @@ namespace Moneyboard.Core.Services
             };
 
             await _userProjectRepository.AddAsync(userProject);
-            await _userManager.AddToRoleAsync(user, "Member");
-            await _userManager.UpdateAsync(user);
             await _userProjectRepository.SaveChangesAsync();
         }
 
