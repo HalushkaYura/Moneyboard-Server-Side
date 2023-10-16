@@ -61,11 +61,8 @@ namespace Moneyboard.Core.Services
         public async Task CreateNewProjectAsync(ProjectCreateDTO projectDTO, string userId)
         {
             var user = await _userRepository.GetByKeyAsync(userId);
-
             if (user == null)
-            {
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
-            }
 
             var bankcard = _mapper.Map<BankCard>(projectDTO);
             var project = _mapper.Map<Project>(projectDTO);
@@ -75,13 +72,11 @@ namespace Moneyboard.Core.Services
                 project.BankCard = bankcard;
                 await _bankCardBaseRepository.AddAsync(bankcard);
                 await _bankCardBaseRepository.SaveChangesAsync();
-
             }
             else
             {
                 project.BankCard = await _bankCardBaseRepository.GetByCardNumberAsync(projectDTO.CardNumber);
                 await _bankCardBaseRepository.SaveChangesAsync();
-
             }
 
             await _projectRepository.AddAsync(project);
@@ -91,9 +86,10 @@ namespace Moneyboard.Core.Services
             {
                 RoleName = "Owner",
                 RolePoints = 100,
+                CreateDate= DateTime.Now,
                 Project = project
-
             };
+
             await _roleRepository.AddAsync(role);
             await _roleRepository.SaveChangesAsync();
 
@@ -130,6 +126,7 @@ namespace Moneyboard.Core.Services
             {
                 RoleName = "Member",
                 RolePoints = 100,
+                CreateDate = DateTime.Now,
                 Project = project
 
             };
@@ -149,14 +146,17 @@ namespace Moneyboard.Core.Services
             await _userProjectRepository.SaveChangesAsync();
         }
 
-        public async Task<ProjectInfoDTO> InfoFromProjectAsync(int projectId)
+        public async Task<ProjectInfoDTO> InfoFromProjectAsync(int projectId, string userId)
         {
             var projectObject = await _projectRepository.GetByKeyAsync(projectId);
 
             if (projectObject == null)
-            {
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
-            }
+            
+            var isOwner = projectObject.UserProjects.Any(up => up.UserId == userId && up.IsOwner);
+
+            if (!isOwner)
+                throw new HttpException(System.Net.HttpStatusCode.Forbidden, ErrorMessages.ProjectNotFound);
 
             var projectInfo = _mapper.Map<ProjectInfoDTO>(projectObject);
 

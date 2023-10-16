@@ -9,7 +9,7 @@ namespace Moneyboard.Core.Interfaces.Services
     public interface IProjectService
     {
         Task CreateNewProjectAsync(ProjectCreateDTO projectDTO, string userId);
-        Task<ProjectInfoDTO> InfoFromProjectAsync(int projectId);
+        Task<ProjectInfoDTO> InfoFromProjectAsync(int projectId, string userId);
         Task EditProjectDateAsync(ProjectEditDTO projectEditDTO, int projectId);
         Task AddMemberToProjectAsync(string userId, int projectId);
         Task<IEnumerable<ProjectForUserDTO>> GetProjectsOwnedByUserAsync(string userId);

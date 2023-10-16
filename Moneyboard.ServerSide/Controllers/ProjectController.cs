@@ -48,7 +48,7 @@ namespace Moneyboard.ServerSide.Controllers
         [Route("info/{projectId}")]
         public async Task<IActionResult> ProjectInfoAsync(int projectId)
         {
-            var projectInfo = await _projectService.InfoFromProjectAsync(projectId);
+            var projectInfo = await _projectService.InfoFromProjectAsync(projectId, UserId);
 
             return Ok(projectInfo);
         }
