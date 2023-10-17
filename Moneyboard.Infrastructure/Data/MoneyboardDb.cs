@@ -7,14 +7,17 @@ using Moneyboard.Core.Entities.RoleEntity;
 using Moneyboard.Core.Entities.UserEntity;
 using Moneyboard.Core.Entities.UserProjectEntity;
 using static Moneyboard.Core.Entities.RefreshTokenEntity.RefreshTocenConfiguration;
+using Moneyboard.Infrastructure.Data.SeedData;
+using Moneyboard.Core.Interfaces.Repository;
 
 namespace Moneyboard.Infrastructure.Data
 {
     public class MoneyboardDb : IdentityDbContext<User>
     {
+
         public MoneyboardDb(DbContextOptions<MoneyboardDb> options) : base(options)
         {
-
+          
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -27,8 +30,8 @@ namespace Moneyboard.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new BankCardConfiguration());
             modelBuilder.ApplyConfiguration(new UserProjectConfiguration());
             modelBuilder.ApplyConfiguration(new RoleConfiguration());
+            //modelBuilder.SeedRoles(_roleRepository);
 
-            //modelBuilder.Seed();
         }
 
         public DbSet<Project> Project { get; set; }

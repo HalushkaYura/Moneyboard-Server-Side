@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Moneyboard.Core.DTO.RoleDTO;
-using Moneyboard.Core.DTO.UserDTO;
-using Moneyboard.Core.Entities.BankCardEntity;
 using Moneyboard.Core.Entities.ProjectEntity;
 using Moneyboard.Core.Entities.RoleEntity;
 using Moneyboard.Core.Entities.UserEntity;
@@ -12,7 +10,6 @@ using Moneyboard.Core.Exeptions;
 using Moneyboard.Core.Interfaces.Repository;
 using Moneyboard.Core.Interfaces.Services;
 using Moneyboard.Core.Resources;
-using System.Data;
 
 namespace Moneyboard.Core.Services
 {
@@ -85,26 +82,21 @@ namespace Moneyboard.Core.Services
             var user = await _userManager.FindByIdAsync(userId);
 
             if (user == null)
-            {
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
-            }
+
 
             var userProject = await _userProjectRepository.GetByPairOfKeysAsync(userId, projectId);
 
             if (userProject == null)
-            {
-                // Обробка помилки, якщо користувач не є членом проекту
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotMember);
-            }
+
 
             await _userManager.AddToRoleAsync(user, roleName);
         }
         public async Task<IEnumerable<RoleInfoDTO>> GetRolesByProjectIdAsync(int projectId)
         {
-            // Отримайте ролі, які належать до певного проекту за його ідентифікатором (projectId)
             var roles = await _roleRepository.GetListAsync(r => r.ProjectId == projectId);
 
-            // Мапуйте ролі на DTO об'єкти (RoleDTO)
             var roleDtos = _mapper.Map<IEnumerable<RoleInfoDTO>>(roles);
 
             return roleDtos;

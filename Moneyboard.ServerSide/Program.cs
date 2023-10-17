@@ -1,11 +1,10 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Moneyboard.Core;
+using Moneyboard.Core.Entities.UserEntity;
 using Moneyboard.Core.Helpers;
-using Moneyboard.Core.Interfaces.Repository;
-using Moneyboard.Core.Interfaces.Services;
-using Moneyboard.Core.Services;
 using Moneyboard.Infrastructure;
-using Moneyboard.Infrastructure.Data.Repositories;
+using Moneyboard.Infrastructure.Data;
 using Moneyboard.WebApi.Middleweres;
 using Moneyboard.WebApi.ServiceExtension;
 using Newtonsoft.Json.Serialization;
@@ -43,7 +42,6 @@ namespace Moneyboard.ServerSide
             services.AddAutoMapper();
             services.AddJwtAuthentication(configuration);
             services.AddMvcCore().AddRazorViewEngine();
-
 
         }
         public static void Main(string[] args)

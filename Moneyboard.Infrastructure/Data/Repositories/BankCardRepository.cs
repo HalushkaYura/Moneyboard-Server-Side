@@ -4,9 +4,9 @@ using Moneyboard.Core.Interfaces.Repository;
 
 namespace Moneyboard.Infrastructure.Data.Repositories
 {
-   public class BankCardRepository //IBankCardRepository
+   public class BankCardRepository : IBankCardRepository
     {
-       /* protected readonly MoneyboardDb _dbContext;
+       protected readonly MoneyboardDb _dbContext;
         protected readonly DbSet<BankCard> _dbSet;
 
         public BankCardRepository(MoneyboardDb dbContext, DbSet<BankCard> dbSet)
@@ -35,6 +35,6 @@ namespace Moneyboard.Infrastructure.Data.Repositories
             var bankCardEntity = await _dbSet.SingleOrDefaultAsync(x => ((BankCard)(object)x).CardNumber == cardNumber);
             return bankCardEntity as BankCard;
        
-        }*/
+        }
     }
 }

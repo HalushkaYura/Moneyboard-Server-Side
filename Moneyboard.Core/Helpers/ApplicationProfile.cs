@@ -31,7 +31,7 @@ namespace Moneyboard.Core.Helpers
                 .ForMember(x => x.WorkspaceName, act => act.MapFrom(srs => srs.Workspace.Name))
                 .ForMember(x => x.FromUserName, act => act.MapFrom(srs => srs.FromUser.Name))
                 .ForMember(x => x.ToUserId, act => act.MapFrom(srs => srs.ToUserId));*/
-    
+
 
             /* CreateMap<BlobDownloadInfo, DownloadFile>()
                  .ForMember(x => x.ContentType, act => act.MapFrom(srs => srs.Details.ContentType))
