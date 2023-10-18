@@ -32,7 +32,7 @@ namespace Moneyboard.Infrastructure.Migrations
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Firstname = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Lastname = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BirthDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CardNumber = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: false),
@@ -62,7 +62,7 @@ namespace Moneyboard.Infrastructure.Migrations
                 {
                     BankCardId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CandNumber = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: false),
+                    CardNumber = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: false),
                     ExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CardVerificationValue = table.Column<string>(type: "nvarchar(3)", maxLength: 3, nullable: false),
                     Money = table.Column<double>(type: "float", nullable: false)

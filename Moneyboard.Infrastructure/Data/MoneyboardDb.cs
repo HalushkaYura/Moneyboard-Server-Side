@@ -30,8 +30,6 @@ namespace Moneyboard.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new BankCardConfiguration());
             modelBuilder.ApplyConfiguration(new UserProjectConfiguration());
             modelBuilder.ApplyConfiguration(new RoleConfiguration());
-            //modelBuilder.SeedRoles(_roleRepository);
-
         }
 
         public DbSet<Project> Project { get; set; }

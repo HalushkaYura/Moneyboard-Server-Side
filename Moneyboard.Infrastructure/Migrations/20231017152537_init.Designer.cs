@@ -12,8 +12,8 @@ using Moneyboard.Infrastructure.Data;
 namespace Moneyboard.Infrastructure.Migrations
 {
     [DbContext(typeof(MoneyboardDb))]
-    [Migration("20231008122916_updateBankcard")]
-    partial class updateBankcard
+    [Migration("20231017152537_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -316,7 +316,6 @@ namespace Moneyboard.Infrastructure.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Lastname")
