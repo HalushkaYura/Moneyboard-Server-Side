@@ -39,9 +39,9 @@ namespace Moneyboard.Core.Services
             IRepository<Role> roleRepository,
             IRepository<UserProject> userProjectRepository,
             UserManager<User> userManager
-            //IProjectRepository projectBaseRepository,
-            //IUserProjectRepository userProjectBaseRepository
-            //IBankCardRepository bankCardRepository
+                                                    //IProjectRepository projectBaseRepository,
+                                                    //IUserProjectRepository userProjectBaseRepository
+                                                    //IBankCardRepository bankCardRepository
                                                     )
         {
             _mapper = mapper;
@@ -61,9 +61,16 @@ namespace Moneyboard.Core.Services
 
         public async Task CreateNewProjectAsync(ProjectCreateDTO projectDTO, string userId)
         {
-            var user = await _userRepository.GetByKeyAsync(userId);
+            var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
+
+            var existingProjects = await _projectRepository.GetListAsync(
+                p => p.Name == projectDTO.Name
+                     && p.UserProjects.Any(up => up.UserId == userId));
+
+            if (existingProjects.Any())
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Project with the same name already exists for this user.");
 
             var bankcard = _mapper.Map<BankCard>(projectDTO);
             var project = _mapper.Map<Project>(projectDTO);
@@ -83,11 +90,12 @@ namespace Moneyboard.Core.Services
             await _projectRepository.AddAsync(project);
             await _projectRepository.SaveChangesAsync();
 
-            var role = new Role
+            Role role;
+            role = new Role
             {
                 RoleName = "Owner",
-                RolePoints = 100,
-                CreateDate= DateTime.Now,
+                RolePoints = 0,
+                CreateDate = DateTime.Now,
                 Project = project
             };
 
@@ -101,7 +109,7 @@ namespace Moneyboard.Core.Services
                 PersonalPoints = 0,
                 UserId = userId,
                 Project = project,
-                Role = null
+                Role = role
             };
 
             await _userProjectRepository.AddAsync(userProject);
@@ -113,26 +121,37 @@ namespace Moneyboard.Core.Services
             var user = await _userManager.FindByIdAsync(userId);
 
             if (user == null)
-            {
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
-            }
+
 
             var project = await _projectRepository.GetByKeyAsync(projectId);
 
             if (project == null)
-            {
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
+
+            var existingMemberRole = await _roleRepository.GetListAsync(
+                r => r.RoleName == "Member" && r.ProjectId == projectId);
+
+            Role role;
+
+            if (existingMemberRole.Any())
+            {
+                role = existingMemberRole.First();
+            }
+            else
+            {
+                role = new Role
+                {
+                    RoleName = "Member",
+                    RolePoints = 0,
+                    CreateDate = DateTime.Now,
+                    ProjectId = projectId
+                };
+
+                await _roleRepository.AddAsync(role);
+                await _roleRepository.SaveChangesAsync();
             }
 
-            var role = new Role
-            {
-                RoleName = "Member",
-                RolePoints = 100,
-                CreateDate = DateTime.Now,
-                Project = project
-            };
-            await _roleRepository.AddAsync(role);
-            await _roleRepository.SaveChangesAsync();
             var userProject = new UserProject
             {
                 IsOwner = false,
@@ -145,6 +164,12 @@ namespace Moneyboard.Core.Services
 
             await _userProjectRepository.AddAsync(userProject);
             await _userProjectRepository.SaveChangesAsync();
+
+        }
+
+        private async void CreateUserProjectAndRole(string userId, int projectId, string name, bool isOwner)
+        {
+
         }
 
         public async Task<ProjectInfoDTO> InfoFromProjectAsync(int projectId, string userId)
@@ -155,10 +180,11 @@ namespace Moneyboard.Core.Services
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
 
             var userProject = await _userProjectRepository.GetUserProjectAsync(userId, projectId);
+
             if (userProject == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
-            
-            bool isOwner = userProject != null && userProject.IsOwner == true ? true : false;
+
+            bool isOwner = userProject != null && userProject.IsOwner == true;
 
             var projectInfo = _mapper.Map<ProjectInfoDTO>(project);
             projectInfo.IsOwner = isOwner;
@@ -171,9 +197,7 @@ namespace Moneyboard.Core.Services
             var project = await _projectRepository.GetByKeyAsync(projectId);
 
             if (project == null)
-            {
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
-            }
 
             project.Name = projectEditDTO.Name;
             project.ProjectPoinPercent = projectEditDTO.ProjectPoinPercent;
@@ -198,21 +222,21 @@ namespace Moneyboard.Core.Services
         }
 
         public async Task<IEnumerable<ProjectForUserDTO>> GetProjectsOwnedByUserAsync(string userId)
-            {
-                var userProjects = await _userProjectRepository.GetListAsync(up => up.UserId == userId && up.IsOwner);
+        {
+            var userProjects = await _userProjectRepository.GetListAsync(up => up.UserId == userId && up.IsOwner);
 
-                var projectIds = userProjects.Select(up => up.ProjectId);
+            var projectIds = userProjects.Select(up => up.ProjectId);
 
-                var projects = await _projectRepository.GetListAsync(p => projectIds.Contains(p.ProjectId));
+            var projects = await _projectRepository.GetListAsync(p => projectIds.Contains(p.ProjectId));
 
-                var projectDtos = _mapper.Map<IEnumerable<ProjectForUserDTO>>(projects);
+            var projectDtos = _mapper.Map<IEnumerable<ProjectForUserDTO>>(projects);
 
-                return projectDtos;
-            }
-    
+            return projectDtos;
+        }
+
         public async Task<IEnumerable<ProjectForUserDTO>> GetProjectsUserIsMemberAsync(string userId)
         {
-            var userProjects = await _userProjectRepository.GetListAsync(up => up.UserId == userId && up.IsOwner == false);
+            var userProjects = await _userProjectRepository.GetListAsync(up => up.UserId == userId && !up.IsOwner);
 
             var projectIds = userProjects.Select(up => up.ProjectId);
 
