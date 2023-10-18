@@ -15,5 +15,6 @@ namespace Moneyboard.Core.Helpers
         JPY,
         CAD,
         AUD,
+        PLN
     }
 }

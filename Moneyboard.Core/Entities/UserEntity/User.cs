@@ -16,5 +16,7 @@ namespace Moneyboard.Core.Entities.UserEntity
 
         public ICollection<UserProject> UserProjects { get; set; }
         public ICollection<RefreshToken> RefreshTokens { get; set; }
+
+        
     }
 }

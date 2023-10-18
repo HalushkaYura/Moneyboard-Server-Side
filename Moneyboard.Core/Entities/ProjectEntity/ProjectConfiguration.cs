@@ -25,7 +25,8 @@ namespace Moneyboard.Core.Entities.ProjectEntity
 
             builder
                 .Property(x => x.SalaryDate)
-                .IsRequired();
+                .IsRequired()
+                .HasColumnType("date");
 
             builder
                 .Property(x => x.ProjectPoinPercent)

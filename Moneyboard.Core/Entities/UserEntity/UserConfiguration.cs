@@ -18,7 +18,8 @@ namespace Moneyboard.Core.Entities.UserEntity
 
             builder
                 .Property(x => x.BirthDate)
-                .IsRequired();
+                .IsRequired()
+                .HasColumnType("date");
 
             builder
                 .Property(x => x.Firstname)
@@ -39,7 +40,8 @@ namespace Moneyboard.Core.Entities.UserEntity
 
             builder
                 .Property(x => x.CreateDate)
-                .IsRequired();
+                .IsRequired()
+                .HasColumnType("date");
 
             builder
                 .HasMany(x => x.UserProjects)

@@ -20,5 +20,6 @@ namespace Moneyboard.Core.Entities.ProjectEntity
 
         public int BankCardId { get; set; }
         public BankCard BankCard { get; set; }
+
     }
 }

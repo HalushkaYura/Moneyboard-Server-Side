@@ -13,5 +13,6 @@ namespace Moneyboard.Core.DTO.ProjectDTO
         public double Money { get; set; }
         public CurrencyType SelectedCurrency { get; set; }
         public int ProjectPoinPercent { get; set; }
+
     }
 }

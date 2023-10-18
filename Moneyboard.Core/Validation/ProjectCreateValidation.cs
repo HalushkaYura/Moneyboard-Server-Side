@@ -17,7 +17,7 @@ namespace Moneyboard.Core.Validation
                  .MaximumLength(255);
 
             RuleFor(dto => dto.BaseSalary)
-                .GreaterThanOrEqualTo(6400);
+                .GreaterThanOrEqualTo(0);
 
             RuleFor(dto => dto.SalaryDate)
                 .NotEmpty();
@@ -36,8 +36,6 @@ namespace Moneyboard.Core.Validation
             RuleFor(dto => dto.ExpirationDate)
                 .NotEmpty();
 
-            RuleFor(dto => dto.Money)
-                .GreaterThanOrEqualTo(10000);
 
             RuleFor(dto => dto.Currency)
                 .IsInEnum();

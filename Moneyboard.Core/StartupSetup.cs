@@ -7,6 +7,7 @@ using Moneyboard.Core.Helpers.Mails;
 using Moneyboard.Core.Interfaces.Services;
 using Moneyboard.Core.Services;
 using Moneyboard.Core.Validation;
+using Newtonsoft.Json.Converters;
 
 namespace Moneyboard.Core
 {
@@ -14,6 +15,13 @@ namespace Moneyboard.Core
     {
         public static void AddCustomServices(this IServiceCollection services)
         {
+            services.AddMvc()
+            .AddJsonOptions(options =>
+            {
+                // Встановіть формат дати у JSON-відповіді
+                options.SerializerSettings.Converters.Add(new IsoDateTimeConverter { DateTimeFormat = "yyyy-MM-dd" });
+            });
+
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IJwtService, JwtService>();
             services.AddTransient<IEmailSenderService, EmailSenderService>();

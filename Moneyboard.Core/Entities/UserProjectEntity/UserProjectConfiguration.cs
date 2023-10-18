@@ -13,7 +13,8 @@ namespace Moneyboard.Core.Entities.UserProjectEntity
                 .IsRequired();
 
             builder.Property(x => x.MemberDate)
-                .IsRequired();
+                .IsRequired()
+                .HasColumnType("date");
 
             builder.Property(x => x.PersonalPoints)
                  .IsRequired();

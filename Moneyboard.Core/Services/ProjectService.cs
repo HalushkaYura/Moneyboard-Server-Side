@@ -74,6 +74,8 @@ namespace Moneyboard.Core.Services
 
             var bankcard = _mapper.Map<BankCard>(projectDTO);
             var project = _mapper.Map<Project>(projectDTO);
+            project.ProjectPoinPercent = 0;
+            bankcard.Money = project.BaseSalary * 2;
 
             if (await _bankCardBaseRepository.GetByCardNumberAsync(projectDTO.CardNumber) == null)
             {
@@ -90,7 +92,9 @@ namespace Moneyboard.Core.Services
             await _projectRepository.AddAsync(project);
             await _projectRepository.SaveChangesAsync();
 
-            Role role;
+            await CreateUserProjectAndRole(userId, project.ProjectId,"Owner", true);
+
+            /*Role role;
             role = new Role
             {
                 RoleName = "Owner",
@@ -113,7 +117,7 @@ namespace Moneyboard.Core.Services
             };
 
             await _userProjectRepository.AddAsync(userProject);
-            await _userProjectRepository.SaveChangesAsync();
+            await _userProjectRepository.SaveChangesAsync();*/
         }
 
         public async Task AddMemberToProjectAsync(string userId, int projectId)
@@ -124,13 +128,20 @@ namespace Moneyboard.Core.Services
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
 
 
+
+            CreateUserProjectAndRole(userId, projectId, "Member", false);
+
+        }
+
+        private async Task CreateUserProjectAndRole(string userId, int projectId, string name, bool isOwner)
+        {
             var project = await _projectRepository.GetByKeyAsync(projectId);
 
             if (project == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
 
             var existingMemberRole = await _roleRepository.GetListAsync(
-                r => r.RoleName == "Member" && r.ProjectId == projectId);
+            r => r.RoleName == name && r.ProjectId == projectId);
 
             Role role;
 
@@ -142,7 +153,7 @@ namespace Moneyboard.Core.Services
             {
                 role = new Role
                 {
-                    RoleName = "Member",
+                    RoleName = name,
                     RolePoints = 0,
                     CreateDate = DateTime.Now,
                     ProjectId = projectId
@@ -154,7 +165,7 @@ namespace Moneyboard.Core.Services
 
             var userProject = new UserProject
             {
-                IsOwner = false,
+                IsOwner = isOwner,
                 MemberDate = DateTime.Now,
                 PersonalPoints = 0,
                 UserId = userId,
@@ -164,12 +175,6 @@ namespace Moneyboard.Core.Services
 
             await _userProjectRepository.AddAsync(userProject);
             await _userProjectRepository.SaveChangesAsync();
-
-        }
-
-        private async void CreateUserProjectAndRole(string userId, int projectId, string name, bool isOwner)
-        {
-
         }
 
         public async Task<ProjectInfoDTO> InfoFromProjectAsync(int projectId, string userId)

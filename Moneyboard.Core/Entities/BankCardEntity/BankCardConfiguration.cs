@@ -26,7 +26,10 @@ namespace Moneyboard.Core.Entities.BankCardEntity
 
             builder
                 .Property(x => x.ExpirationDate)
-                .IsRequired();
+                .IsRequired()
+                .HasColumnType("date");
+
+
 
             builder
                 .HasMany(x => x.Projects)
