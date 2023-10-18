@@ -27,8 +27,8 @@ namespace Moneyboard.Core.Services
         protected readonly IRepository<UserProject> _userProjectRepository;
         protected readonly IRepository<User> _userRepository;
         protected readonly IRepository<Role> _roleRepository;
-        protected readonly IProjectRepository _projectBaseRepository;
-        protected readonly IUserProjectRepository _userProjectBaseRepository;
+        //protected readonly IProjectRepository _projectBaseRepository;
+        //protected readonly IUserProjectRepository _userProjectBaseRepository;
         public ProjectService(
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
@@ -38,9 +38,9 @@ namespace Moneyboard.Core.Services
             IRepository<User> userRepository,
             IRepository<Role> roleRepository,
             IRepository<UserProject> userProjectRepository,
-            UserManager<User> userManager,
+            UserManager<User> userManager
             //IProjectRepository projectBaseRepository,
-            IUserProjectRepository userProjectBaseRepository
+            //IUserProjectRepository userProjectBaseRepository
             //IBankCardRepository bankCardRepository
                                                     )
         {
@@ -52,13 +52,13 @@ namespace Moneyboard.Core.Services
             _userProjectRepository = userProjectRepository;
             _userRepository = userRepository;
             _userManager = userManager;
-            //_projectBaseRepository = projectBaseRepository;
-            _userProjectRepository = userProjectRepository;
             _roleRepository = roleRepository;
+            //_projectBaseRepository = projectBaseRepository;
+            //_userProjectRepository = userProjectBaseRepository;
             //_bankCardRepository = bankCardRepository;
         }
 
-   
+
         public async Task CreateNewProjectAsync(ProjectCreateDTO projectDTO, string userId)
         {
             var user = await _userRepository.GetByKeyAsync(userId);
@@ -101,7 +101,7 @@ namespace Moneyboard.Core.Services
                 PersonalPoints = 0,
                 UserId = userId,
                 Project = project,
-                Role = role
+                Role = null
             };
 
             await _userProjectRepository.AddAsync(userProject);
@@ -123,13 +123,13 @@ namespace Moneyboard.Core.Services
             {
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
             }
+
             var role = new Role
             {
                 RoleName = "Member",
                 RolePoints = 100,
                 CreateDate = DateTime.Now,
                 Project = project
-
             };
             await _roleRepository.AddAsync(role);
             await _roleRepository.SaveChangesAsync();
@@ -157,6 +157,7 @@ namespace Moneyboard.Core.Services
             var userProject = await _userProjectRepository.GetUserProjectAsync(userId, projectId);
             if (userProject == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
+            
             bool isOwner = userProject != null && userProject.IsOwner == true ? true : false;
 
             var projectInfo = _mapper.Map<ProjectInfoDTO>(project);

@@ -75,11 +75,11 @@ namespace Moneyboard.ServerSide.Controllers
 
         [Authorize]
         [HttpPut]
-        [Route("edit")]
-        public async Task<IActionResult> EditProject([FromBody] ProjectEditDTO projectEditDTO)
+        [Route("edit/{projectId}")]
+        public async Task<IActionResult> EditProject([FromBody] ProjectEditDTO projectEditDTO, int projectId)
         {
 
-            await _projectService.EditProjectDateAsync(projectEditDTO, projectEditDTO.projectId);
+            await _projectService.EditProjectDateAsync(projectEditDTO, projectId);
             return Ok("Проект успішно оновлено");
         }
 
