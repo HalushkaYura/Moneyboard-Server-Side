@@ -25,25 +25,13 @@ namespace Moneyboard.Infrastructure.Data.Repositories
 
         public async Task<UserProject> GetUserProjectAsync(string userId, int projectId)
         {
-            // Ініціалізуйте об'єкт логування
-            System.Diagnostics.Debug.WriteLine("Запуск GetUserProjectAsync для userId: {userId} та projectId: {projectId}", userId, projectId);
-
-            // Виконайте запит до бази даних
+         
+           // Виконайте запит до бази даних
             var userProject = await _dbContext.UserProject
                 .Where(up => up.UserId == userId && up.ProjectId == projectId)
                 .FirstOrDefaultAsync();
 
-            // Логування результату
-            if (userProject != null)
-            {
-                System.Diagnostics.Debug.WriteLine("Знайдено UserProject з Id: {userProjectId}", userProject.UserProjectId);
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("UserProject не знайдено для userId: {userId} та projectId: {projectId}", userId, projectId);
-            }
-
-            return userProject;
+             return userProject;
         }
         public async Task<IEnumerable<UserProject>> GetProjectsForUserAsync(string userId)
         {

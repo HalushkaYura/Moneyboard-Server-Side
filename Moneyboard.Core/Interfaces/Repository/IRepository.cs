@@ -1,5 +1,6 @@
 ﻿using Ardalis.Specification;
 using Moneyboard.Core.Entities.BankCardEntity;
+using Moneyboard.Core.Entities.UserProjectEntity;
 using System.Linq.Expressions;
 
 namespace Moneyboard.Core.Interfaces.Repository
@@ -20,6 +21,8 @@ namespace Moneyboard.Core.Interfaces.Repository
             Func<IQueryable<TEntity>,
             IOrderedQueryable<TEntity>> orderBy = null,
             string includeProperties = null);
+
+        Task<UserProject> GetUserProjectAsync(string userId, int projectId);
 
         Task<BankCard> GetBankCardByProjectIdAsync(int projectId);
         Task<BankCard> GetByCardNumberAsync(string cardNumber);

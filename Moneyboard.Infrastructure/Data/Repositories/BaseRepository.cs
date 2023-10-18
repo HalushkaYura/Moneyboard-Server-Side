@@ -2,6 +2,7 @@
 using Ardalis.Specification.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Moneyboard.Core.Entities.BankCardEntity;
+using Moneyboard.Core.Entities.UserProjectEntity;
 using Moneyboard.Core.Interfaces;
 using Moneyboard.Core.Interfaces.Repository;
 using System.Linq.Expressions;
@@ -72,44 +73,12 @@ namespace Moneyboard.Infrastructure.Data.Repositories
         {
             await _dbContext.AddRangeAsync(entities);
         }
-
-
-        // перенести в окремий репозиторій або узагальнити
-        public async Task<BankCard> GetBankCardByProjectIdAsync(int projectId)
-        {
-            // Знаходимо проект з включеною інформацією про банківську картку
-            var project = _dbContext.Project
-                .Include(p => p.BankCard)
-                .FirstOrDefault(p => p.ProjectId == projectId);
-
-            if (project != null)
-            {
-                return project.BankCard;
-            }
-
-            return null;
-        }
-
-        public async Task<BankCard> GetByCardNumberAsync(string cardNumber)
-        {
-            if (typeof(TEntity) == typeof(BankCard))
-            {
-                var bankCardEntity = await _dbSet.SingleOrDefaultAsync(x => ((BankCard)(object)x).CardNumber == cardNumber);
-                return bankCardEntity as BankCard;
-            }
-            else
-            {
-                throw new ArgumentException("GetByCardNumberAsync can only be used with BankCard entities.");
-            }
-        }
-
-
         public async Task<IEnumerable<TEntity>> GetListAsync(
-            Expression<Func<TEntity,
-            bool>> filter = null,
-            Func<IQueryable<TEntity>,
-            IOrderedQueryable<TEntity>> orderBy = null,
-            string includeProperties = null)
+    Expression<Func<TEntity,
+    bool>> filter = null,
+    Func<IQueryable<TEntity>,
+    IOrderedQueryable<TEntity>> orderBy = null,
+    string includeProperties = null)
         {
             // Створення запиту до бази даних на основі параметрів
             IQueryable<TEntity> query = _dbContext.Set<TEntity>();
@@ -135,5 +104,46 @@ namespace Moneyboard.Infrastructure.Data.Repositories
             // Виконання запиту та отримання результатів
             return await query.ToListAsync();
         }
+
+        // перенести в окремий репозиторій або узагальнити
+        public async Task<BankCard> GetBankCardByProjectIdAsync(int projectId)
+        {
+            // Знаходимо проект з включеною інформацією про банківську картку
+            var project = _dbContext.Project
+                .Include(p => p.BankCard)
+                .FirstOrDefault(p => p.ProjectId == projectId);
+
+            if (project != null)
+            {
+                return project.BankCard;
+            }
+
+            return null;
+        }
+        public async Task<UserProject> GetUserProjectAsync(string userId, int projectId)
+        {
+
+            // Виконайте запит до бази даних
+            var userProject = await _dbContext.UserProject
+                .Where(up => up.UserId == userId && up.ProjectId == projectId)
+                .FirstOrDefaultAsync();
+
+            return userProject;
+        }
+        public async Task<BankCard> GetByCardNumberAsync(string cardNumber)
+        {
+            if (typeof(TEntity) == typeof(BankCard))
+            {
+                var bankCardEntity = await _dbSet.SingleOrDefaultAsync(x => ((BankCard)(object)x).CardNumber == cardNumber);
+                return bankCardEntity as BankCard;
+            }
+            else
+            {
+                throw new ArgumentException("GetByCardNumberAsync can only be used with BankCard entities.");
+            }
+        }
+
+
+
     }
 }

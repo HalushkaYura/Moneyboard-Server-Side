@@ -38,9 +38,9 @@ namespace Moneyboard.Core.Services
             IRepository<User> userRepository,
             IRepository<Role> roleRepository,
             IRepository<UserProject> userProjectRepository,
-            UserManager<User> userManager
+            UserManager<User> userManager,
             //IProjectRepository projectBaseRepository,
-            //IUserProjectRepository userProjectBaseRepository
+            IUserProjectRepository userProjectBaseRepository
             //IBankCardRepository bankCardRepository
                                                     )
         {
@@ -154,18 +154,13 @@ namespace Moneyboard.Core.Services
             if (project == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
 
-            var userProject = await _userProjectRepository.GetAllAsync();
-
-            if(userProject == null)
+            var userProject = await _userProjectRepository.GetUserProjectAsync(userId, projectId);
+            if (userProject == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
-           
-            bool tmp = false;
-
-            if (userProject.Select(x => x.UserId == userId && x.IsOwner == true) != null)
-                tmp = true;
+            bool isOwner = userProject != null && userProject.IsOwner == true ? true : false;
 
             var projectInfo = _mapper.Map<ProjectInfoDTO>(project);
-            projectInfo.IsOwner=tmp;
+            projectInfo.IsOwner = isOwner;
 
             return projectInfo;
         }
