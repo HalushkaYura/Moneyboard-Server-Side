@@ -44,9 +44,7 @@ namespace Moneyboard.Core.Services
 
         public async Task EditBankCardDateAsync(BankCardEditDTO banckCardEditDTO, int projectId, string userId)
         {
-            var userProject = await _userProjectRepository.GetListAsync(up => up.ProjectId == projectId && up.UserId == userId);
-            if (userProject == null || userProject.First().IsOwner == false)
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.AttachmentNotFound);
+            var project = await _projectRepository.GetByKeyAsync(projectId );
 
             var bankCard = await _bankCardBaseRepository.GetBankCardByProjectIdAsync(projectId);
 
@@ -54,7 +52,6 @@ namespace Moneyboard.Core.Services
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.AttachmentNotFound);
 
             _mapper.Map(banckCardEditDTO, bankCard);
-            var project = await _projectRepository.GetByKeyAsync(projectId);
             bankCard.Money = project.BaseSalary * 2;
 
             await _bankCardBaseRepository.UpdateAsync(bankCard);

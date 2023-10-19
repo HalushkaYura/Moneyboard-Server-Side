@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Moneyboard.Core.DTO.ProjectDTO
 {
-    public class ProjectPointProcent
+    public class ProjectPointProcentDTO
     {
         public int ProjectPoinPercent { get; set; }
     }

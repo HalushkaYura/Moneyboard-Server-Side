@@ -83,7 +83,7 @@ namespace Moneyboard.ServerSide.Controllers
         public async Task<IActionResult> EditProject([FromBody] ProjectEditDTO projectEditDTO, int projectId)
         {
 
-            await _projectService.EditProjectDateAsync(projectEditDTO, projectId);
+            await _projectService.EditProjectDateAsync(projectEditDTO, projectId, UserId);
             return Ok("Проект успішно оновлено");
         }
 
@@ -105,7 +105,16 @@ namespace Moneyboard.ServerSide.Controllers
             var info = await _bankCardService.InfoBankCardAsync(projectId, UserId);
             return Ok(info);
         }
-        
+
+        [Authorize]
+        [HttpPut]
+        [Route("point/{projectId}")]
+        public async Task<IActionResult> UpdatePointProcent(ProjectPointProcentDTO projectPointProcentDTO, int projectId)
+        {
+            await _projectService.EditProjectPointPrecent(projectPointProcentDTO, projectId, UserId);
+            return Ok();
+        }
+
 
     }
 }

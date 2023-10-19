@@ -12,7 +12,6 @@ using Moneyboard.Core.Interfaces.Repository;
 using Moneyboard.Core.Interfaces.Services;
 using Moneyboard.Core.Resources;
 
-
 namespace Moneyboard.Core.Services
 {
     public class ProjectService : IProjectService
@@ -75,7 +74,7 @@ namespace Moneyboard.Core.Services
             var bankcard = _mapper.Map<BankCard>(projectDTO);
             var project = _mapper.Map<Project>(projectDTO);
             project.ProjectPoinPercent = 0;
-            project.SalaryDate =  GetSalaryDate(projectDTO.SalaryDay);
+            project.SalaryDate = GetSalaryDate(projectDTO.SalaryDay);
             bankcard.Money = project.BaseSalary * 2;
 
             if (await _bankCardBaseRepository.GetByCardNumberAsync(projectDTO.CardNumber) == null)
@@ -93,10 +92,10 @@ namespace Moneyboard.Core.Services
             await _projectRepository.AddAsync(project);
             await _projectRepository.SaveChangesAsync();
 
-            await CreateUserProjectAndRole(userId, project.ProjectId,"Owner", true);
+            await CreateUserProjectAndRole(userId, project.ProjectId, "Owner", true);
         }
 
-        private  DateTime GetSalaryDate(int salaryDay)
+        private DateTime GetSalaryDate(int salaryDay)
         {
             DateTime today = DateTime.Today;
 
@@ -184,25 +183,32 @@ namespace Moneyboard.Core.Services
             return projectInfo;
         }
 
-        public async Task EditProjectDateAsync(ProjectEditDTO projectEditDTO, int projectId)
+        public async Task EditProjectDateAsync(ProjectEditDTO projectEditDTO, int projectId, string userId)
         {
             var project = await _projectRepository.GetByKeyAsync(projectId);
 
             if (project == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
-           
-            project.Currency = projectEditDTO.Currency.ToString();
-            project.BaseSalary = projectEditDTO.BaseSalary;
-            project.SalaryDate = GetSalaryDate(projectEditDTO.SalaryDay);
-            project.Name = projectEditDTO.Name;
-            project.ProjectPoinPercent = projectEditDTO.ProjectPoinPercent;
+            
+
+            project = _mapper.Map(projectEditDTO, project);
 
 
             await _projectRepository.UpdateAsync(project);
             await _projectRepository.SaveChangesAsync();
 
         }
+        public async Task EditProjectPointPrecent(ProjectPointProcentDTO projectPointProcent, int projectId, string userId)
+        {
+            var project = await _projectRepository.GetByKeyAsync(projectId);
+            if (project == null)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
 
+            project.ProjectPoinPercent = projectPointProcent.ProjectPoinPercent;
+
+            await _projectRepository.UpdateAsync(project);
+            await _projectRepository.SaveChangesAsync();
+        }
         public async Task<IEnumerable<ProjectForUserDTO>> GetProjectsOwnedByUserAsync(string userId)
         {
             var userProjects = await _userProjectRepository.GetListAsync(up => up.UserId == userId && up.IsOwner);
