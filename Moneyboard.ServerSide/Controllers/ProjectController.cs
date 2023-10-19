@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Moneyboard.Core.DTO.BankCardDTO;
 using Moneyboard.Core.DTO.ProjectDTO;
 using Moneyboard.Core.Interfaces.Services;
 using System.Security.Claims;
@@ -12,14 +13,17 @@ namespace Moneyboard.ServerSide.Controllers
     {
         private readonly Core.Interfaces.Services.IProjectService _projectService;
         private readonly IRoleService _roleService;
+        private readonly IBankCardService _bankCardService;
         private string UserId => User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
         public ProjectController(
             Core.Interfaces.Services.IProjectService projectService,
-            IRoleService roleService)
+            IRoleService roleService,
+            IBankCardService bankCardService)
         {
             _projectService = projectService;
             _roleService = roleService;
+            _bankCardService = bankCardService;
         }
 
         [Authorize]
@@ -75,13 +79,33 @@ namespace Moneyboard.ServerSide.Controllers
 
         [Authorize]
         [HttpPut]
-        [Route("edit/{projectId}")]
+        [Route("editProject/{projectId}")]
         public async Task<IActionResult> EditProject([FromBody] ProjectEditDTO projectEditDTO, int projectId)
         {
 
             await _projectService.EditProjectDateAsync(projectEditDTO, projectId);
             return Ok("Проект успішно оновлено");
         }
+
+        [Authorize]
+        [HttpPut]
+        [Route("editBankCard/{projectId}")]
+        public async Task<IActionResult> EditBankCard([FromBody] BankCardEditDTO bankCardEditDTO, int projectId)
+        {
+
+            await _bankCardService.EditBankCardDateAsync(bankCardEditDTO, projectId, UserId);
+            return Ok("Проект успішно оновлено");
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("infoBankCard/{projectId}")]
+        public async Task<IActionResult> GetBankCard(int projectId)
+        {
+            var info = await _bankCardService.InfoBankCardAsync(projectId, UserId);
+            return Ok(info);
+        }
+        
 
     }
 }

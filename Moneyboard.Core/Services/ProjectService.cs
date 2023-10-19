@@ -75,6 +75,7 @@ namespace Moneyboard.Core.Services
             var bankcard = _mapper.Map<BankCard>(projectDTO);
             var project = _mapper.Map<Project>(projectDTO);
             project.ProjectPoinPercent = 0;
+            project.SalaryDate =  GetSalaryDate(projectDTO.SalaryDay);
             bankcard.Money = project.BaseSalary * 2;
 
             if (await _bankCardBaseRepository.GetByCardNumberAsync(projectDTO.CardNumber) == null)
@@ -93,33 +94,21 @@ namespace Moneyboard.Core.Services
             await _projectRepository.SaveChangesAsync();
 
             await CreateUserProjectAndRole(userId, project.ProjectId,"Owner", true);
-
-            /*Role role;
-            role = new Role
-            {
-                RoleName = "Owner",
-                RolePoints = 0,
-                CreateDate = DateTime.Now,
-                Project = project
-            };
-
-            await _roleRepository.AddAsync(role);
-            await _roleRepository.SaveChangesAsync();
-
-            var userProject = new UserProject
-            {
-                IsOwner = true,
-                MemberDate = DateTime.Now,
-                PersonalPoints = 0,
-                UserId = userId,
-                Project = project,
-                Role = role
-            };
-
-            await _userProjectRepository.AddAsync(userProject);
-            await _userProjectRepository.SaveChangesAsync();*/
         }
 
+        private  DateTime GetSalaryDate(int salaryDay)
+        {
+            DateTime today = DateTime.Today;
+
+            if (today.Day >= salaryDay)
+            {
+                today = today.AddMonths(1);
+            }
+
+            DateTime targetDate = new DateTime(today.Year, today.Month, salaryDay);
+
+            return targetDate;
+        }
         public async Task AddMemberToProjectAsync(string userId, int projectId)
         {
             var user = await _userManager.FindByIdAsync(userId);
@@ -127,9 +116,7 @@ namespace Moneyboard.Core.Services
             if (user == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
 
-
-
-            CreateUserProjectAndRole(userId, projectId, "Member", false);
+            await CreateUserProjectAndRole(userId, projectId, "Member", false);
 
         }
 
@@ -203,27 +190,17 @@ namespace Moneyboard.Core.Services
 
             if (project == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
-
+           
+            project.Currency = projectEditDTO.Currency.ToString();
+            project.BaseSalary = projectEditDTO.BaseSalary;
+            project.SalaryDate = GetSalaryDate(projectEditDTO.SalaryDay);
             project.Name = projectEditDTO.Name;
             project.ProjectPoinPercent = projectEditDTO.ProjectPoinPercent;
-            project.Currency = projectEditDTO.SelectedCurrency.ToString();
-            project.SalaryDate = projectEditDTO.SalaryDate;
-            project.BaseSalary = projectEditDTO.Salary;
 
-            var bankCard = await _bankCardBaseRepository.GetBankCardByProjectIdAsync(projectId);
-
-            if (bankCard == null)
-            {
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.AttachmentNotFound);
-            }
-
-            bankCard.ExpirationDate = projectEditDTO.ExpirationDate;
-            bankCard.CardNumber = projectEditDTO.NumberCard;
-            bankCard.CardVerificationValue = projectEditDTO.CVV;
-            bankCard.Money = projectEditDTO.Money;
 
             await _projectRepository.UpdateAsync(project);
-            await _bankCardBaseRepository.UpdateAsync(bankCard);
+            await _projectRepository.SaveChangesAsync();
+
         }
 
         public async Task<IEnumerable<ProjectForUserDTO>> GetProjectsOwnedByUserAsync(string userId)

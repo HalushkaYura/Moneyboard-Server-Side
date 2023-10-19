@@ -1,4 +1,5 @@
 using AutoMapper;
+using Moneyboard.Core.DTO.BankCardDTO;
 using Moneyboard.Core.DTO.ProjectDTO;
 using Moneyboard.Core.DTO.RoleDTO;
 using Moneyboard.Core.DTO.UserDTO;
@@ -15,13 +16,18 @@ namespace Moneyboard.Core.Helpers
         {
 
             CreateMap<User, UserChangeInfoDTO>().ReverseMap();
-            CreateMap<UserRegistrationDTO, User>().ReverseMap();
+            CreateMap<UserRegistrationDTO, User>().ReverseMap(); 
+            CreateMap<User, UserChangeInfoDTO>();
+
             CreateMap<ProjectCreateDTO, BankCard>().ReverseMap();
             CreateMap<ProjectCreateDTO, Project>().ReverseMap();
-            CreateMap<Project, ProjectInfoDTO>().ReverseMap();
-            CreateMap<RoleCreateDTO, Role>().ReverseMap();
+            CreateMap<Project, ProjectInfoDTO>();
             CreateMap<ProjectForUserDTO, Project>().ReverseMap();
 
+            CreateMap<RoleCreateDTO, Role>().ReverseMap();
+
+            CreateMap<BankCardEditDTO, BankCard>().ReverseMap();
+            CreateMap<BankCard, BankCardInfoDTO>();
 
 
             /*CreateMap<InviteUser, UserInviteInfoDTO>()
