@@ -7,6 +7,7 @@ using Moneyboard.Core.Entities.BankCardEntity;
 using Moneyboard.Core.Entities.ProjectEntity;
 using Moneyboard.Core.Entities.RoleEntity;
 using Moneyboard.Core.Entities.UserEntity;
+using Moneyboard.Core.Entities.UserProjectEntity;
 
 namespace Moneyboard.Core.Helpers
 {
@@ -23,6 +24,14 @@ namespace Moneyboard.Core.Helpers
             CreateMap<ProjectCreateDTO, Project>().ReverseMap();
             CreateMap<Project, ProjectInfoDTO>();
             CreateMap<ProjectForUserDTO, Project>().ReverseMap();
+            CreateMap<Project, ProjectDetailsDTO>();
+
+            CreateMap<User, ProjectMemberDTO>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => $"{src.Firstname} {src.Lastname}"))
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id));
+
+            CreateMap<Role, ProjectMemberDTO>();
+            CreateMap<UserProject, ProjectMemberDTO>();
 
             CreateMap<RoleCreateDTO, Role>().ReverseMap();
 

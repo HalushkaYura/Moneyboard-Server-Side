@@ -44,7 +44,7 @@ namespace Moneyboard.Core.Validation
 
 
             RuleFor(dto => dto.Currency)
-                .IsInEnum();
+                .NotEmpty();
         }
 
         private bool IsValidLuhnAlgorithm(string cardNumber)

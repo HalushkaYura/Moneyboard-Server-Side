@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Moneyboard.Core.DTO.ProjectDTO;
 using Moneyboard.Core.Entities.BankCardEntity;
 using Moneyboard.Core.Entities.ProjectEntity;
@@ -11,6 +12,7 @@ using Moneyboard.Core.Exeptions;
 using Moneyboard.Core.Interfaces.Repository;
 using Moneyboard.Core.Interfaces.Services;
 using Moneyboard.Core.Resources;
+using System.Data;
 
 namespace Moneyboard.Core.Services
 {
@@ -58,7 +60,7 @@ namespace Moneyboard.Core.Services
         }
 
 
-        public async Task CreateNewProjectAsync(ProjectCreateDTO projectDTO, string userId)
+        public async Task<ProjectIdDTO> CreateNewProjectAsync(ProjectCreateDTO projectDTO, string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
@@ -91,8 +93,9 @@ namespace Moneyboard.Core.Services
 
             await _projectRepository.AddAsync(project);
             await _projectRepository.SaveChangesAsync();
-
             await CreateUserProjectAndRole(userId, project.ProjectId, "Owner", true);
+
+            return new ProjectIdDTO { ProjectId = project.ProjectId };
         }
 
         private DateTime GetSalaryDate(int salaryDay)
@@ -189,7 +192,7 @@ namespace Moneyboard.Core.Services
 
             if (project == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
-            
+
 
             project = _mapper.Map(projectEditDTO, project);
 
@@ -233,6 +236,49 @@ namespace Moneyboard.Core.Services
             var projectDtos = _mapper.Map<IEnumerable<ProjectForUserDTO>>(projects);
 
             return projectDtos;
+        }
+        public async Task<ProjectDetailsDTO> GetProjectDetailsAsync(int projectId, string userId)
+        {
+            var userProjectTest = await _userProjectRepository.GetListAsync(x => x.ProjectId == projectId && x.UserId == userId && (x.IsOwner != true && x.IsOwner != false));
+            if (userProjectTest == null)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
+
+            var project = await _projectRepository.GetByKeyAsync(projectId);
+            if (project == null)
+            {
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
+            }
+
+            var projectDTO = _mapper.Map<ProjectDetailsDTO>(project);
+
+            var userProjects = await _userProjectRepository.GetListAsync(x => x.ProjectId == projectId);
+            var userProjectUserIds = userProjects.Select(up => up.UserId).ToList();
+            var roles = await _roleRepository.GetListAsync(x => x.ProjectId == projectId);
+            var users = await _userRepository.GetListAsync(x => userProjectUserIds.Contains(x.Id));
+
+
+            var memberDTOs = _mapper.Map<List<ProjectMemberDTO>>(userProjects);
+
+            var usersDTO = _mapper.Map<List<ProjectMemberDTO>>(users);
+            var rolesDTO = _mapper.Map<List<ProjectMemberDTO>>(roles);
+
+            for (var i = 0; i < memberDTOs.Count; i++)
+            {
+                // Знаходимо відповідність між об'єктами за Id
+                var userDTO = usersDTO.FirstOrDefault(u => u.UserId == userProjects.ElementAt(i).UserId);
+                var roleDTO = rolesDTO.FirstOrDefault(r => r.RoleId == userProjects.ElementAt(i).RoleId);
+
+                // Просто присвоюємо значення з мапованих об'єктів
+                memberDTOs[i].UserName = userDTO.UserName;
+                memberDTOs[i].ImageUrl = userDTO.ImageUrl;
+                memberDTOs[i].RoleName = roleDTO.RoleName;
+                memberDTOs[i].RolePoints = roleDTO.RolePoints;
+            }
+
+
+            projectDTO.Members = memberDTOs;
+
+            return projectDTO;
         }
     }
 }

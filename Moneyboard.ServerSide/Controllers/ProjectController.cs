@@ -31,9 +31,9 @@ namespace Moneyboard.ServerSide.Controllers
         [Route("create")]
         public async Task<IActionResult> CreateProjectAsync([FromBody] ProjectCreateDTO projectCreateDTO)
         {
-            await _projectService.CreateNewProjectAsync(projectCreateDTO, UserId);
+            var id =  await _projectService.CreateNewProjectAsync(projectCreateDTO, UserId);
 
-            return Ok();
+            return Ok(id);
         }
 
         [Authorize]
@@ -114,7 +114,14 @@ namespace Moneyboard.ServerSide.Controllers
             await _projectService.EditProjectPointPrecent(projectPointProcentDTO, projectId, UserId);
             return Ok();
         }
-
+        [Authorize]
+        [HttpGet]
+        [Route("details/{projectId}")]
+        public async Task<IActionResult> ProjectTableInfo( int projectId)
+        {
+            var info  = await _projectService.GetProjectDetailsAsync(projectId, UserId);
+            return Ok(info);
+        }
 
     }
 }

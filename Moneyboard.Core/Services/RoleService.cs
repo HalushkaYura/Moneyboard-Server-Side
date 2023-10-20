@@ -21,12 +21,14 @@ namespace Moneyboard.Core.Services
         protected readonly IHttpContextAccessor _httpContextAccessor;
         protected readonly UserManager<User> _userManager;
         protected readonly IRepository<UserProject> _userProjectRepository;
+        private readonly IRepository<User> _userRepository;
 
         public RoleService(
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
             IRepository<Project> projectRepository,
             IRepository<Role> roleRepository,
+            IRepository<User> userRepository,
             UserManager<User> userManager,
             IRepository<UserProject> userProjectRepository)
         {
@@ -36,6 +38,7 @@ namespace Moneyboard.Core.Services
             _roleRepository = roleRepository;
             _userManager = userManager;
             _userProjectRepository = userProjectRepository;
+            _userRepository = userRepository;
         }
         public async Task CreateNewRoleAsync(int projectId, RoleCreateDTO roleCreateDTO)
         {
@@ -77,7 +80,7 @@ namespace Moneyboard.Core.Services
             await _roleRepository.UpdateAsync(role);
         }
 
-        public async Task AssignRoleToProjectMemberAsync(string userId, int projectId, string roleName)
+        public async Task AssignRoleToProjectMemberAsync(string userId, int projectId, int roleId)
         {
             var user = await _userManager.FindByIdAsync(userId);
 
@@ -91,15 +94,15 @@ namespace Moneyboard.Core.Services
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotMember);
 
 
-            await _userManager.AddToRoleAsync(user, roleName);
+            userProject.Role = await _roleRepository.GetByKeyAsync(roleId);
         }
         public async Task<IEnumerable<RoleInfoDTO>> GetRolesByProjectIdAsync(int projectId)
         {
             var roles = await _roleRepository.GetListAsync(r => r.ProjectId == projectId);
-
-            var roleDtos = _mapper.Map<IEnumerable<RoleInfoDTO>>(roles);
+            var roleDtos =  _mapper.Map<IEnumerable<RoleInfoDTO>>(roles);
 
             return roleDtos;
         }
+
     }
 }
