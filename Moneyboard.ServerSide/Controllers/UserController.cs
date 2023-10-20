@@ -18,27 +18,34 @@ namespace Moneyboard.ServerSide.Controllers
             _userService = userService;
         }
 
-        [HttpPut]
-        [Authorize]
-        [Route("image")]
-        public async Task<IActionResult> UpdateImageAsync([FromForm] UserUploadImageDTO uploadImage)
-        {
-            await _userService.UpdateUserImageAsync(uploadImage.Image, UserId);
-
-            return Ok();
-        }
-
         [Authorize]
         [HttpGet]
         [Route("image")]
-        public async Task<FileResult> GetUserImageAsync()
+        public async Task<IActionResult> GetUserImage()
         {
-            //We don't use IDisposable.Dispose here from type DownloadFile
-            //because it will invoke from FileStreamResult
-            var file = await _userService.GetUserImageAsync(UserId);
+            // Отримати фотографію користувача за ідентифікатором користувача
+            var image = await _userService.GetUserImageAsync(UserId);
 
-            return File(file.Content, file.ContentType, file.Name);
+            if (image == null)
+            {
+                return NotFound(); // Якщо фотографія не знайдена
+            }
+
+            return File(image.Content, image.ContentType); // Повернути фотографію у відповіді
         }
+
+
+        [HttpPut]
+        [Authorize]
+        [Route("image")]
+        public async Task<IActionResult> UpdateImageAsync([FromForm] UserImageUploadDTO uploadImage)
+        {
+            await _userService.UpdateUserImageAsync(UserId, uploadImage.Image);
+            return Ok("Фотографію користувача оновлено");
+        }
+
+
+       
 
         [HttpGet]
         [Authorize]

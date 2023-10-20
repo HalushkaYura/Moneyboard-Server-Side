@@ -25,7 +25,8 @@ namespace Moneyboard.Core.Validation
                 .LessThan(28);
 
             RuleFor(dto => dto.Currency)
-                .IsInEnum();
+                .NotEmpty()
+                .NotNull();
         }
 
     }

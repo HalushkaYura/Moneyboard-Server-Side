@@ -18,6 +18,10 @@ namespace Moneyboard.Core.Validation
 
             RuleFor(dto => dto.BaseSalary)
                 .GreaterThanOrEqualTo(0);
+            
+            RuleFor(dto => dto.Money)
+                .NotEmpty()
+                .GreaterThan(0);
 
             RuleFor(dto => dto.SalaryDay)
                 .NotEmpty()

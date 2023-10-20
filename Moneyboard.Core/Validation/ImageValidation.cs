@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Moneyboard.Core.Validation
 {
-    public class ImageValidation: AbstractValidator<UserUploadImageDTO>
+    public class ImageValidation: AbstractValidator<UserImageUploadDTO>
     {
         private readonly IOptions<ImageSettings> options;
 

@@ -11,8 +11,8 @@ namespace Moneyboard.Core.DTO.ProjectDTO
         public string CardNumber { get; set; }
         public string CardVerificationValue { get; set; }
         public DateTime ExpirationDate { get; set; }
-        //public double Money { get; set; }
-        public CurrencyType Currency { get; set; }
+        public double Money { get; set; }
+        public string Currency { get; set; }
         //public int ProjectPoinPercent { get; set; }
     }
 }

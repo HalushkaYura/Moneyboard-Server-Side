@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\gratis-png-icono-de-perfil-icono-de-usuario-simple.png" />
+    <None Include="wwwroot\png-transparent-computer-icons-avatar-avatar-angle-heroes-recruiter-thumbnail.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="7.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.11" />

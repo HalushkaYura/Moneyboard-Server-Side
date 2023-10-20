@@ -86,18 +86,17 @@ namespace Moneyboard.Core.Services
             }
         }
 
-        public async Task UpdateUserImageAsync(IFormFile img, string userId)
+        public async Task UpdateUserImageAsync(string userId, IFormFile image)
         {
             var user = await _userManager.FindByIdAsync(userId);
 
-            string newPath = await _fileService.AddFileAsync(img.OpenReadStream(), _imageSettings.Value.Path, img.FileName);
+            if (user == null)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
 
-            if (user.ImageUrl != null)
-            {
-                await _fileService.DeleteFileAsync(user.ImageUrl);
-            }
+            // Зберегти фотографію та отримати її шлях
+            string imagePath = await _fileService.AddFileAsync(image.OpenReadStream(), "/avatars", image.FileName);
 
-            user.ImageUrl = newPath;
+            user.ImageUrl = imagePath;
 
             await _userManager.UpdateAsync(user);
         }
@@ -106,14 +105,14 @@ namespace Moneyboard.Core.Services
         {
             var user = await _userManager.FindByIdAsync(userId);
 
-            _ = user.ImageUrl ?? throw new HttpException(System.Net.HttpStatusCode.NotFound,
-                ErrorMessages.ImageNotFound);
+            if (user == null || string.IsNullOrEmpty(user.ImageUrl))
+            {
+                return null; // Повернути null, якщо фотографію не знайдено
+            }
 
-            var file = await _fileService.GetFileAsync(user.ImageUrl);
-
-            return file;
+            // Отримати фотографію за її шляхом
+            return await _fileService.GetFileAsync(user.ImageUrl);
         }
-
         public async Task<bool> CheckIsTwoFactorVerificationAsync(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);

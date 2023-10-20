@@ -18,7 +18,7 @@ namespace Moneyboard.Core.Interfaces.Services
         Task ChangeTwoFactorVerificationStatusAsync(string userId, UserChange2faStatusDTO statusDTO);
         Task<bool> CheckIsTwoFactorVerificationAsync(string userId);
         Task SendTwoFactorCodeAsync(string userId);
-        Task UpdateUserImageAsync(IFormFile img, string userId);
+        Task UpdateUserImageAsync(string userId, IFormFile image);
         Task<DownloadFile> GetUserImageAsync(string userId);
         Task SetPasswordAsync(string userId, UserSetPasswordDTO userSetPasswordDTO);
         Task<bool> IsHavePasswordAsync(string userId);
