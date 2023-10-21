@@ -30,4 +30,8 @@
     <ProjectReference Include="..\Moneyboard.Infrastructure\Moneyboard.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\images\users\" />
+  </ItemGroup>
+
 </Project>

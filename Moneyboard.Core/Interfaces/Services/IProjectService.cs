@@ -14,11 +14,11 @@ namespace Moneyboard.Core.Interfaces.Services
         Task AddMemberToProjectAsync(string userId, int projectId);
         Task<IEnumerable<ProjectForUserDTO>> GetProjectsOwnedByUserAsync(string userId);
         Task<IEnumerable<ProjectForUserDTO>> GetProjectsUserIsMemberAsync(string userId);
-        Task EditProjectPointPrecent(ProjectRolesDTO projectPointProcent, int projectId, string userId);
+        Task EditProjectPointPrecent(ProjectPointDTO projectPointProcent, int projectId);
         Task<ProjectDetailsDTO> GetProjectDetailsAsync(int projectId, string userId);
         Task DeleteProjectAsync(int projectId, string userId);
         Task LeaveTheProjectAsync(int projectId, string userId);
-        Task UpdateProjectRolesAsync(int projectId, ProjectRolesDTO projectRoles);
+        Task EditProjectPointAsync(int projectId, ProjectPointDTO projectRoles);
 
 
 

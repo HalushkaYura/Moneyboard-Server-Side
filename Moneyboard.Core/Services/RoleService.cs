@@ -98,9 +98,9 @@ namespace Moneyboard.Core.Services
         }
         public async Task<List<RoleInfoDTO>> GetRolesByProjectIdAsync(int projectId)
         {
-            //var project = _projectRepository.GetByKeyAsync(projectId);
-        //    if (project == null)
-                //throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
+            var project = await _projectRepository.GetByKeyAsync(projectId);
+            if (project == null)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
 
             var roles = await _roleRepository.GetListAsync(r => r.ProjectId == projectId);
             var roleDTO = _mapper.Map<List<RoleInfoDTO>>(roles);

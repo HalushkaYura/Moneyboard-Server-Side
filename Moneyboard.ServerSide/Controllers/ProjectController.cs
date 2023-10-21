@@ -109,9 +109,9 @@ namespace Moneyboard.ServerSide.Controllers
         [Authorize]
         [HttpPut]
         [Route("point/{projectId}")]
-        public async Task<IActionResult> UpdatePointProcent(ProjectRolesDTO projectPointProcentDTO, int projectId)
+        public async Task<IActionResult> UpdatePointProcent([FromBody] ProjectPointDTO projectPointProcentDTO, int projectId)
         {
-            await _projectService.EditProjectPointPrecent(projectPointProcentDTO, projectId, UserId);
+            await _projectService.EditProjectPointPrecent(projectPointProcentDTO, projectId);
             return Ok();
         }
         [Authorize]
@@ -123,15 +123,6 @@ namespace Moneyboard.ServerSide.Controllers
             return Ok(info);
         }
 
-        [Authorize]
-        [HttpPut]
-        [Route("roles/{projectId}")]
-        public async Task<IActionResult> UpdateProjectRoles(int projectId, [FromBody] ProjectRolesDTO projectRoles)
-        {
-
-                await _projectService.UpdateProjectRolesAsync(projectId, projectRoles);
-                return Ok();
-        }
 
         [Authorize]
         [HttpDelete]

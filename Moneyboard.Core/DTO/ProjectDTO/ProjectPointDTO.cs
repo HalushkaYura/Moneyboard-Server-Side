@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 
 namespace Moneyboard.Core.DTO.ProjectDTO
 {
-    public class ProjectRolesDTO
+    public class ProjectPointDTO
     {
-        public int ProjectId { get; set; }
-        public List<RoleEditDTO> Roles { get; set; }
         public int ProjectPoinPercent { get; set; }
     }
 }

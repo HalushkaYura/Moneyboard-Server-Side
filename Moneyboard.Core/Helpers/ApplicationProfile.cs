@@ -26,7 +26,9 @@ namespace Moneyboard.Core.Helpers
                 .ForMember(dest => dest.PayDay, ops => ops.MapFrom(src => src.SalaryDate.Month));
             
             CreateMap<ProjectForUserDTO, Project>().ReverseMap();
-            CreateMap<Project, ProjectDetailsDTO>();
+            CreateMap<Project, ProjectDetailsDTO>()
+                 .ForMember(dest => dest.ProjectPointPercent, opt => opt.MapFrom(src => src.ProjectPoinPercent));
+
 
             CreateMap<User, ProjectMemberDTO>()
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => $"{src.Firstname} {src.Lastname}"))

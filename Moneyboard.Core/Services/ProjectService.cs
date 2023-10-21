@@ -148,8 +148,11 @@ namespace Moneyboard.Core.Services
                     RolePoints = 0,
                     CreateDate = DateTime.Now.Date,
                     ProjectId = projectId,
-                    IsDefolt = true,
                 };
+                if (name == "Owner")
+                    role.IsDefolt = true;
+                else
+                    role.IsDefolt = false;
 
                 await _roleRepository.AddAsync(role);
                 await _roleRepository.SaveChangesAsync();
@@ -204,7 +207,7 @@ namespace Moneyboard.Core.Services
             await _projectRepository.SaveChangesAsync();
 
         }
-        public async Task EditProjectPointPrecent(ProjectRolesDTO projectPointProcent, int projectId, string userId)
+        public async Task EditProjectPointPrecent(ProjectPointDTO projectPointProcent, int projectId)
         {
             var project = await _projectRepository.GetByKeyAsync(projectId);
             if (project == null)
@@ -242,8 +245,8 @@ namespace Moneyboard.Core.Services
         }
         public async Task<ProjectDetailsDTO> GetProjectDetailsAsync(int projectId, string userId)
         {
-            var userProjectTest = await _userProjectRepository.GetListAsync(x => x.ProjectId == projectId && x.UserId == userId && (x.IsOwner != true && x.IsOwner != false));
-            if (userProjectTest == null)
+            var userProjectTest = await _userProjectRepository.GetUserProjectAsync(userId, projectId);
+            if (userProjectTest == null || userProjectTest.IsOwner ==null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
 
             var project = await _projectRepository.GetByKeyAsync(projectId);
@@ -310,29 +313,18 @@ namespace Moneyboard.Core.Services
 
         }
 
-        public async Task UpdateProjectRolesAsync(int projectId, ProjectRolesDTO projectRoles)
+        public async Task EditProjectPointAsync(int projectId, ProjectPointDTO projectPointDTO)
         {
             var project = await _projectRepository.GetByKeyAsync(projectId);
 
             if (project == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
 
-            foreach (var roleDto in projectRoles.Roles)
-            {
-                var existingRole = project.Roles.FirstOrDefault(r => r.RoleId == roleDto.RoleId);
-
-                if (existingRole != null)
-                {
-                    existingRole.RoleName = roleDto.RoleName;
-                    existingRole.RolePoints = roleDto.RolePoints;
-                }
-                else
-                {
-                    throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Role not found");
-                }
-            }
-
+            project.ProjectPoinPercent = projectPointDTO.ProjectPoinPercent;
+            
             await _projectRepository.UpdateAsync(project);
+            await _projectRepository.SaveChangesAsync();
+
         }
     }
 }
