@@ -109,7 +109,7 @@ namespace Moneyboard.ServerSide.Controllers
         [Authorize]
         [HttpPut]
         [Route("point/{projectId}")]
-        public async Task<IActionResult> UpdatePointProcent(ProjectPointProcentDTO projectPointProcentDTO, int projectId)
+        public async Task<IActionResult> UpdatePointProcent(ProjectRolesDTO projectPointProcentDTO, int projectId)
         {
             await _projectService.EditProjectPointPrecent(projectPointProcentDTO, projectId, UserId);
             return Ok();

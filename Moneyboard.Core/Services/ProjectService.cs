@@ -206,7 +206,7 @@ namespace Moneyboard.Core.Services
             await _projectRepository.SaveChangesAsync();
 
         }
-        public async Task EditProjectPointPrecent(ProjectPointProcentDTO projectPointProcent, int projectId, string userId)
+        public async Task EditProjectPointPrecent(ProjectRolesDTO projectPointProcent, int projectId, string userId)
         {
             var project = await _projectRepository.GetByKeyAsync(projectId);
             if (project == null)

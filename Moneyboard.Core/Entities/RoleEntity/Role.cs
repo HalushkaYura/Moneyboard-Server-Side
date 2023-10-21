@@ -14,7 +14,7 @@ namespace Moneyboard.Core.Entities.RoleEntity
         public int RoleId { get; set; }
         public string RoleName { get; set; }
         public int RolePoints { get; set; }
-        public bool IsDefolt { get; set; }
+        public bool? IsDefolt { get; set; }
         public DateTime CreateDate { get; set; }
 
 

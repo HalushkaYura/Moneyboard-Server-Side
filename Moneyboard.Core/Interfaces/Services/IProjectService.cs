@@ -14,7 +14,7 @@ namespace Moneyboard.Core.Interfaces.Services
         Task AddMemberToProjectAsync(string userId, int projectId);
         Task<IEnumerable<ProjectForUserDTO>> GetProjectsOwnedByUserAsync(string userId);
         Task<IEnumerable<ProjectForUserDTO>> GetProjectsUserIsMemberAsync(string userId);
-        Task EditProjectPointPrecent(ProjectPointProcentDTO projectPointProcent, int projectId, string userId);
+        Task EditProjectPointPrecent(ProjectRolesDTO projectPointProcent, int projectId, string userId);
         Task<ProjectDetailsDTO> GetProjectDetailsAsync(int projectId, string userId);
         //Task<(IEnumerable<ProjectForUserDTO> Owners, IEnumerable<ProjectForUserDTO> Members)> GetAllProjectsForUserAsync(string userId);
 
