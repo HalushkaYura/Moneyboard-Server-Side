@@ -287,7 +287,7 @@ namespace Moneyboard.Core.Services
             if (project == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
             var userProject = await _userProjectRepository.GetUserProjectAsync(userId,projectId);
-            if (userProject == null || userProject.IsOwner)
+            if (userProject == null || userProject.IsOwner !=true)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Not enough rights");
 
             await _projectRepository.DeleteAsync(project);
@@ -300,9 +300,9 @@ namespace Moneyboard.Core.Services
             if (project == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
             var userProject = await _userProjectRepository.GetUserProjectAsync(userId, projectId);
-            
-            if(userProject == null)
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.AttachmentNotFound);
+
+            if (userProject == null || userProject.IsOwner == true)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Impossible action");
 
 
             await _userProjectRepository.DeleteAsync(userProject);

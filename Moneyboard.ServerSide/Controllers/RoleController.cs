@@ -43,10 +43,10 @@ namespace Moneyboard.ServerSide.Controllers
 
         [Authorize]
         [HttpPut]
-        [Route("edit/{roleId}")]
-        public async Task<IActionResult> EditRole(int roleId, [FromBody] RoleEditDTO roleEditDTO)
+        [Route("edit")]
+        public async Task<IActionResult> EditRole([FromBody] RoleEditDTO roleEditDTO)
         {
-            await _roleService.EditRoleDateAsync(roleId, roleEditDTO);
+            await _roleService.EditRoleDateAsync(roleEditDTO);
             return Ok();
         }
 
@@ -61,7 +61,7 @@ namespace Moneyboard.ServerSide.Controllers
 
         [Authorize]
         [HttpDelete]
-        [Route("{roleId}")]
+        [Route("delete/{roleId}")]
         public async Task<IActionResult> DeleteRole(int roleId)
         {
             await _roleService.DeleteRoleAsync(roleId, UserId);

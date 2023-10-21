@@ -125,7 +125,7 @@ namespace Moneyboard.ServerSide.Controllers
 
         [Authorize]
         [HttpPut]
-        [Route("{projectId}/roles")]
+        [Route("roles/{projectId}")]
         public async Task<IActionResult> UpdateProjectRoles(int projectId, [FromBody] ProjectRolesDTO projectRoles)
         {
 
@@ -135,7 +135,7 @@ namespace Moneyboard.ServerSide.Controllers
 
         [Authorize]
         [HttpDelete]
-        [Route("{projectId}")]
+        [Route("delete/{projectId}")]
         public async Task<IActionResult> DeleteRole(int projectId)
         {
             await _projectService.DeleteProjectAsync(projectId, UserId);

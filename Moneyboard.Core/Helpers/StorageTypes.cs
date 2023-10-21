@@ -2,7 +2,6 @@
 {
     public enum StorageTypes
     {
-        AzureBlob,
         Locale
     }
 }

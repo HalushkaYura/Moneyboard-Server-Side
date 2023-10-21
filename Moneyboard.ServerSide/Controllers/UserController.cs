@@ -76,6 +76,40 @@ namespace Moneyboard.ServerSide.Controllers
 
             return Ok(userInfo);
         }
+        ////////////////////////////////////////////////////////////////////////////////
+
+       /* [HttpPost("upload-image")]
+        public async Task<IActionResult> UploadUserImage([FromForm] UserImageUploadDTO imageDTO)
+        {
+            try
+            {
+                var user = await _userService.GetUserByIdAsync(User.Identity.Name);
+                if (user == null)
+                {
+                    return NotFound("User not found");
+                }
+
+                if (imageDTO.Image != null)
+                {
+                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/users");
+                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + imageDTO.Image.FileName;
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imageDTO.Image.CopyToAsync(fileStream);
+                    }
+                    user.ImageUrl = uniqueFileName;
+                    await _userService.UpdateUserAsync(user);
+                    return Ok("Image uploaded successfully");
+                }
+
+                return BadRequest("No image uploaded");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }*/
 
     }
 }
