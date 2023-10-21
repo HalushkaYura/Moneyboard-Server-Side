@@ -8,7 +8,7 @@ namespace Moneyboard.Core.DTO.RoleDTO
 {
     public class RoleInfoDTO
     {
-        public string Name { get; set; }
+        public string RoleName { get; set; }
         public int RolePoints { get; set; }
     }
 }

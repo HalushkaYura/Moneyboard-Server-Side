@@ -18,6 +18,8 @@ namespace Moneyboard.Core.Validation
             RuleFor(dto => dto.RolePoints)
                 .NotEmpty()
                 .GreaterThanOrEqualTo(0);
+
+            
         }
     }
 }

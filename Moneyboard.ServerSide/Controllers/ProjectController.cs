@@ -38,10 +38,10 @@ namespace Moneyboard.ServerSide.Controllers
 
         [Authorize]
         [HttpPost]
-        [Route("add-member/{projectId}/{userId}")]
-        public async Task<IActionResult> AddMemberToProjectAsync( int projectId,  string userId)
+        [Route("add-member/{projectId}")]
+        public async Task<IActionResult> AddMemberToProjectAsync( int projectId)
         {
-            await _projectService.AddMemberToProjectAsync(userId, projectId);
+            await _projectService.AddMemberToProjectAsync(UserId, projectId);
             return Ok();
         }
 

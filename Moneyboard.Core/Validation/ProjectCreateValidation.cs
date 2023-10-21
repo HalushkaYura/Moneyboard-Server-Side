@@ -1,10 +1,5 @@
 ﻿using FluentValidation;
 using Moneyboard.Core.DTO.ProjectDTO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Moneyboard.Core.Validation
 {
@@ -18,33 +13,38 @@ namespace Moneyboard.Core.Validation
 
             RuleFor(dto => dto.BaseSalary)
                 .GreaterThanOrEqualTo(0);
-            
+
             RuleFor(dto => dto.Money)
                 .NotEmpty()
                 .GreaterThan(0);
 
             RuleFor(dto => dto.SalaryDay)
+                .NotNull()
                 .NotEmpty()
                 .GreaterThan(0)
                 .LessThan(28);
 
             RuleFor(dto => dto.CardNumber)
                 .NotEmpty()
+                .NotNull()
                 .Matches(@"^\d{16}$")
                 .Matches("^[0-9]+$")
                 .Must(IsValidLuhnAlgorithm).WithMessage("{PropertyName} is not a valid credit card number.");
-            
+
 
             RuleFor(dto => dto.CardVerificationValue)
                 .NotEmpty()
+                .NotNull()
                 .Length(3);
 
             RuleFor(dto => dto.ExpirationDate)
+                .NotNull()
                 .NotEmpty();
 
 
             RuleFor(dto => dto.Currency)
-                .NotEmpty();
+                .NotNull()
+               .NotEmpty();
         }
 
         private bool IsValidLuhnAlgorithm(string cardNumber)

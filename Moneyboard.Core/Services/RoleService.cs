@@ -72,9 +72,9 @@ namespace Moneyboard.Core.Services
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Role not found.");
             }
 
-            role.RoleName = roleEditDTO.Name;
+            role.RoleName = roleEditDTO.RoleName;
             role.RolePoints = roleEditDTO.RolePoints;
-            role.CreateDate = DateTime.Now;
+            role.CreateDate = DateTime.Now.Date;
 
 
             await _roleRepository.UpdateAsync(role);
@@ -99,10 +99,11 @@ namespace Moneyboard.Core.Services
         public async Task<IEnumerable<RoleInfoDTO>> GetRolesByProjectIdAsync(int projectId)
         {
             var roles = await _roleRepository.GetListAsync(r => r.ProjectId == projectId);
-            var roleDtos =  _mapper.Map<IEnumerable<RoleInfoDTO>>(roles);
+            var roleDtos = _mapper.Map<IEnumerable<RoleInfoDTO>>(roles);
 
             return roleDtos;
         }
+
 
     }
 }

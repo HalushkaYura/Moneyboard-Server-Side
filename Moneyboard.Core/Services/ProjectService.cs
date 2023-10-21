@@ -117,6 +117,10 @@ namespace Moneyboard.Core.Services
 
             if (user == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
+            var existingUserProject = await _userProjectRepository.GetListAsync(up => up.UserId == userId && up.ProjectId == projectId);
+
+            if (existingUserProject.Any())
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "User is already a member of this project.");
 
             await CreateUserProjectAndRole(userId, projectId, "Member", false);
 
@@ -144,7 +148,7 @@ namespace Moneyboard.Core.Services
                 {
                     RoleName = name,
                     RolePoints = 0,
-                    CreateDate = DateTime.Now,
+                    CreateDate = DateTime.Now.Date,
                     ProjectId = projectId
                 };
 
@@ -155,7 +159,7 @@ namespace Moneyboard.Core.Services
             var userProject = new UserProject
             {
                 IsOwner = isOwner,
-                MemberDate = DateTime.Now,
+                MemberDate = DateTime.Now.Date,
                 PersonalPoints = 0,
                 UserId = userId,
                 Project = project,

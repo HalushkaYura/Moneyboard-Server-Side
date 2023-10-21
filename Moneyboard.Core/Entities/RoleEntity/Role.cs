@@ -21,9 +21,5 @@ namespace Moneyboard.Core.Entities.RoleEntity
         public Project Project { get; set; }
 
         public ICollection<UserProject> UserProjects { get; set;}
-        public string FormattedCreateDate
-        {
-            get { return CreateDate.ToString("dd/MM/yy"); }
-        }
     }
 }
