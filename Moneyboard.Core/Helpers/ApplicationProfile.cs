@@ -32,7 +32,7 @@ namespace Moneyboard.Core.Helpers
 
             CreateMap<Role, ProjectMemberDTO>();
             CreateMap<UserProject, ProjectMemberDTO>();
-
+            CreateMap<Role, RoleInfoDTO>();
             CreateMap<RoleCreateDTO, Role>().ReverseMap();
 
             CreateMap<BankCardEditDTO, BankCard>().ReverseMap();

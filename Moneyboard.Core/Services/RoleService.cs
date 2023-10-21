@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Moneyboard.Core.DTO.ProjectDTO;
 using Moneyboard.Core.DTO.RoleDTO;
 using Moneyboard.Core.Entities.ProjectEntity;
 using Moneyboard.Core.Entities.RoleEntity;
@@ -96,12 +97,13 @@ namespace Moneyboard.Core.Services
 
             userProject.Role = await _roleRepository.GetByKeyAsync(roleId);
         }
-        public async Task<IEnumerable<RoleInfoDTO>> GetRolesByProjectIdAsync(int projectId)
+        public async Task<List<RoleInfoDTO>> GetRolesByProjectIdAsync(int projectId)
         {
             var roles = await _roleRepository.GetListAsync(r => r.ProjectId == projectId);
-            var roleDtos = _mapper.Map<IEnumerable<RoleInfoDTO>>(roles);
+            var roleDtos = roles.Select(r => new RoleInfoDTO { RoleName = r.RoleName, RolePoints = r.RolePoints }).ToList();
+            var roleDTO = _mapper.Map<List<RoleInfoDTO>>(roles);
 
-            return roleDtos;
+            return roleDTO;
         }
 
 
