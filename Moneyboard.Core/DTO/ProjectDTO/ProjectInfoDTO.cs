@@ -16,7 +16,7 @@ namespace Moneyboard.Core.DTO.ProjectDTO
         public string Currency { get; set; }
         public double BaseSalary { get; set; }
         public DateTime SalaryDate { get; set; }
-        public bool IsOwner { get; set; }
+        public bool? IsOwner { get; set; }
 
 
     }

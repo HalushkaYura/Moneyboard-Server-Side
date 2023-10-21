@@ -56,7 +56,7 @@ namespace Moneyboard.Core.Services
             }
 
             var role = _mapper.Map<Role>(roleCreateDTO);
-
+            role.IsDefolt = false;
             role.Project = project;
             await _roleRepository.AddAsync(role);
 
@@ -100,9 +100,8 @@ namespace Moneyboard.Core.Services
         public async Task<List<RoleInfoDTO>> GetRolesByProjectIdAsync(int projectId)
         {
             var roles = await _roleRepository.GetListAsync(r => r.ProjectId == projectId);
-            var roleDtos = roles.Select(r => new RoleInfoDTO { RoleName = r.RoleName, RolePoints = r.RolePoints }).ToList();
+            //var roleDtos = roles.Select(r => new RoleInfoDTO { RoleName = r.RoleName, RolePoints = r.RolePoints }).ToList();
             var roleDTO = _mapper.Map<List<RoleInfoDTO>>(roles);
-
             return roleDTO;
         }
 

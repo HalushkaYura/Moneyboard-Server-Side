@@ -10,5 +10,6 @@ namespace Moneyboard.Core.DTO.RoleDTO
     {
         public string RoleName { get; set; }
         public int RolePoints { get; set; }
+        public bool IsDefolt { get; set; }
     }
 }

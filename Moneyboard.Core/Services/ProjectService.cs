@@ -149,7 +149,8 @@ namespace Moneyboard.Core.Services
                     RoleName = name,
                     RolePoints = 0,
                     CreateDate = DateTime.Now.Date,
-                    ProjectId = projectId
+                    ProjectId = projectId,
+                    IsDefolt = true,
                 };
 
                 await _roleRepository.AddAsync(role);
@@ -178,11 +179,11 @@ namespace Moneyboard.Core.Services
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
 
             var userProject = await _userProjectRepository.GetUserProjectAsync(userId, projectId);
-
+            bool? isOwner;
             if (userProject == null)
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
-
-            bool isOwner = userProject != null && userProject.IsOwner == true;
+                isOwner = null; 
+            else
+                isOwner = userProject != null && userProject.IsOwner == true;
 
             var projectInfo = _mapper.Map<ProjectInfoDTO>(project);
             projectInfo.IsOwner = isOwner;
