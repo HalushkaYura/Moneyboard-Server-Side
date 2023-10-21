@@ -24,11 +24,10 @@ namespace Moneyboard.ServerSide.Controllers
 
         [Authorize]
         [HttpPost]
-        [Route("create")]
-        public async Task<IActionResult> CreateRoleAsync([FromBody] RoleCreateDTO roleCreateDTO)
+        [Route("create/{projectId}")]
+        public async Task<IActionResult> CreateRoleAsync(int projectId)
         {
-            await _roleService.CreateNewRoleAsync(roleCreateDTO.ProjectId, roleCreateDTO);
-
+            await _roleService.CreateNewRoleAsync(projectId);
             return Ok();
         }
 
@@ -58,6 +57,15 @@ namespace Moneyboard.ServerSide.Controllers
         {
             var roles = await _roleService.GetRolesByProjectIdAsync(projectId);
             return Ok(roles);
+        }
+
+        [Authorize]
+        [HttpDelete]
+        [Route("{roleId}")]
+        public async Task<IActionResult> DeleteRole(int roleId)
+        {
+            await _roleService.DeleteRoleAsync(roleId, UserId);
+            return Ok("Role deleted successfully");
         }
     }
 }

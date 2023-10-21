@@ -4,9 +4,10 @@ namespace Moneyboard.Core.Interfaces.Services
 {
     public interface IRoleService
     {
-        Task CreateNewRoleAsync(int projectId, RoleCreateDTO roleCreateDTO);
+        Task CreateNewRoleAsync(int projectId);
         Task EditRoleDateAsync(int roleId, RoleEditDTO roleEditDTO);
         Task AssignRoleToProjectMemberAsync(string userId, int projectId, int roleId);
         Task<List<RoleInfoDTO>> GetRolesByProjectIdAsync(int projectId);
+        Task DeleteRoleAsync(int roleId, string userId);
     }
 }

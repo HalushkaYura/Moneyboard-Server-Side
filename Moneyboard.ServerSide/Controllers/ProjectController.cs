@@ -31,7 +31,7 @@ namespace Moneyboard.ServerSide.Controllers
         [Route("create")]
         public async Task<IActionResult> CreateProjectAsync([FromBody] ProjectCreateDTO projectCreateDTO)
         {
-            var id =  await _projectService.CreateNewProjectAsync(projectCreateDTO, UserId);
+            var id = await _projectService.CreateNewProjectAsync(projectCreateDTO, UserId);
 
             return Ok(id);
         }
@@ -39,7 +39,7 @@ namespace Moneyboard.ServerSide.Controllers
         [Authorize]
         [HttpPost]
         [Route("add-member/{projectId}")]
-        public async Task<IActionResult> AddMemberToProjectAsync( int projectId)
+        public async Task<IActionResult> AddMemberToProjectAsync(int projectId)
         {
             await _projectService.AddMemberToProjectAsync(UserId, projectId);
             return Ok();
@@ -117,11 +117,38 @@ namespace Moneyboard.ServerSide.Controllers
         [Authorize]
         [HttpGet]
         [Route("details/{projectId}")]
-        public async Task<IActionResult> ProjectTableInfo( int projectId)
+        public async Task<IActionResult> ProjectTableInfo(int projectId)
         {
-            var info  = await _projectService.GetProjectDetailsAsync(projectId, UserId);
+            var info = await _projectService.GetProjectDetailsAsync(projectId, UserId);
             return Ok(info);
         }
 
+        [Authorize]
+        [HttpPut]
+        [Route("{projectId}/roles")]
+        public async Task<IActionResult> UpdateProjectRoles(int projectId, [FromBody] ProjectRolesDTO projectRoles)
+        {
+
+                await _projectService.UpdateProjectRolesAsync(projectId, projectRoles);
+                return Ok();
+        }
+
+        [Authorize]
+        [HttpDelete]
+        [Route("{projectId}")]
+        public async Task<IActionResult> DeleteRole(int projectId)
+        {
+            await _projectService.DeleteProjectAsync(projectId, UserId);
+            return Ok("Project deleted successfully");
+        }
+
+        [Authorize]
+        [HttpDelete]
+        [Route("leave/{projectId}")]
+        public async Task<IActionResult> Leave(int projectId)
+        {
+            await _projectService.LeaveTheProjectAsync(projectId, UserId);
+            return Ok();
+        }
     }
 }

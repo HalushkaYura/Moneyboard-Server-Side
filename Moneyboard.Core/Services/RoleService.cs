@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Moneyboard.Core.DTO.ProjectDTO;
 using Moneyboard.Core.DTO.RoleDTO;
 using Moneyboard.Core.Entities.ProjectEntity;
 using Moneyboard.Core.Entities.RoleEntity;
@@ -11,6 +10,7 @@ using Moneyboard.Core.Exeptions;
 using Moneyboard.Core.Interfaces.Repository;
 using Moneyboard.Core.Interfaces.Services;
 using Moneyboard.Core.Resources;
+using System.Data;
 
 namespace Moneyboard.Core.Services
 {
@@ -41,25 +41,28 @@ namespace Moneyboard.Core.Services
             _userProjectRepository = userProjectRepository;
             _userRepository = userRepository;
         }
-        public async Task CreateNewRoleAsync(int projectId, RoleCreateDTO roleCreateDTO)
+        public async Task CreateNewRoleAsync(int projectId)
         {
             var project = await _projectRepository.GetByKeyAsync(projectId);
             if (project == null)
-            {
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
-            }
+
             var roles = await _roleRepository.GetAllAsync();
-            bool roleExists = roles.Any(r => r.RoleName == roleCreateDTO.RoleName && r.ProjectId == projectId);
+            bool roleExists = roles.Any(r => r.RoleName == "New role" && r.ProjectId == projectId);
             if (roleExists)
-            {
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.FileNameAlreadyExist);
-            }
+            
+            var role = new Role
+            {
+                IsDefolt = false,
+                Project = project,
+                RoleName = "New role",
+                RolePoints = 0
 
-            var role = _mapper.Map<Role>(roleCreateDTO);
-            role.IsDefolt = false;
-            role.Project = project;
+            };
+
+ 
             await _roleRepository.AddAsync(role);
-
             await _projectRepository.SaveChangesAsync();
             await _roleRepository.SaveChangesAsync();
         }
@@ -68,10 +71,7 @@ namespace Moneyboard.Core.Services
         {
             var role = await _roleRepository.GetByKeyAsync(roleId);
 
-            if (role == null)
-            {
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Role not found.");
-            }
+
 
             role.RoleName = roleEditDTO.RoleName;
             role.RolePoints = roleEditDTO.RolePoints;
@@ -100,11 +100,20 @@ namespace Moneyboard.Core.Services
         public async Task<List<RoleInfoDTO>> GetRolesByProjectIdAsync(int projectId)
         {
             var roles = await _roleRepository.GetListAsync(r => r.ProjectId == projectId);
-            //var roleDtos = roles.Select(r => new RoleInfoDTO { RoleName = r.RoleName, RolePoints = r.RolePoints }).ToList();
             var roleDTO = _mapper.Map<List<RoleInfoDTO>>(roles);
             return roleDTO;
         }
 
+        public async Task DeleteRoleAsync(int roleId, string userId)
+        {
+            var role = await _roleRepository.GetByKeyAsync(roleId);
 
+            if (role == null)
+            {
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Role not found");
+            }
+            await _roleRepository.DeleteAsync(role);
+            await _roleRepository.SaveChangesAsync();
+        }
     }
 }

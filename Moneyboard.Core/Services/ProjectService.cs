@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Moneyboard.Core.DTO.ProjectDTO;
 using Moneyboard.Core.Entities.BankCardEntity;
 using Moneyboard.Core.Entities.ProjectEntity;
@@ -67,8 +66,7 @@ namespace Moneyboard.Core.Services
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
 
             var existingProjects = await _projectRepository.GetListAsync(
-                p => p.Name == projectDTO.Name
-                     && p.UserProjects.Any(up => up.UserId == userId));
+                p => p.Name == projectDTO.Name && p.UserProjects.Any(up => up.UserId == userId));
 
             if (existingProjects.Any())
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Project with the same name already exists for this user.");
@@ -76,8 +74,8 @@ namespace Moneyboard.Core.Services
             var bankcard = _mapper.Map<BankCard>(projectDTO);
             var project = _mapper.Map<Project>(projectDTO);
             project.ProjectPoinPercent = 0;
+            project.CreateDate = DateTime.Now;
             project.SalaryDate = GetSalaryDate(projectDTO.SalaryDay);
-            bankcard.Money = project.BaseSalary * 2;
 
             if (await _bankCardBaseRepository.GetByCardNumberAsync(projectDTO.CardNumber) == null)
             {
@@ -181,7 +179,7 @@ namespace Moneyboard.Core.Services
             var userProject = await _userProjectRepository.GetUserProjectAsync(userId, projectId);
             bool? isOwner;
             if (userProject == null)
-                isOwner = null; 
+                isOwner = null;
             else
                 isOwner = userProject != null && userProject.IsOwner == true;
 
@@ -250,9 +248,7 @@ namespace Moneyboard.Core.Services
 
             var project = await _projectRepository.GetByKeyAsync(projectId);
             if (project == null)
-            {
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
-            }
 
             var projectDTO = _mapper.Map<ProjectDetailsDTO>(project);
 
@@ -284,6 +280,59 @@ namespace Moneyboard.Core.Services
             projectDTO.Members = memberDTOs;
 
             return projectDTO;
+        }
+        public async Task DeleteProjectAsync(int projectId, string userId)
+        {
+            var project = await _projectRepository.GetByKeyAsync(projectId);
+            if (project == null)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
+            var userProject = await _userProjectRepository.GetUserProjectAsync(userId,projectId);
+            if (userProject == null || userProject.IsOwner)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Not enough rights");
+
+            await _projectRepository.DeleteAsync(project);
+            await _projectRepository.SaveChangesAsync();
+        }
+        public async Task LeaveTheProjectAsync(int projectId, string userId)
+        {
+
+            var project = await _projectRepository.GetByKeyAsync(projectId);
+            if (project == null)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
+            var userProject = await _userProjectRepository.GetUserProjectAsync(userId, projectId);
+            
+            if(userProject == null)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.AttachmentNotFound);
+
+
+            await _userProjectRepository.DeleteAsync(userProject);
+            await _userProjectRepository.SaveChangesAsync();
+
+        }
+
+        public async Task UpdateProjectRolesAsync(int projectId, ProjectRolesDTO projectRoles)
+        {
+            var project = await _projectRepository.GetByKeyAsync(projectId);
+
+            if (project == null)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
+
+            foreach (var roleDto in projectRoles.Roles)
+            {
+                var existingRole = project.Roles.FirstOrDefault(r => r.RoleId == roleDto.RoleId);
+
+                if (existingRole != null)
+                {
+                    existingRole.RoleName = roleDto.RoleName;
+                    existingRole.RolePoints = roleDto.RolePoints;
+                }
+                else
+                {
+                    throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Role not found");
+                }
+            }
+
+            await _projectRepository.UpdateAsync(project);
         }
     }
 }

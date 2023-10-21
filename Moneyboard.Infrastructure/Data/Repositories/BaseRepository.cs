@@ -108,7 +108,6 @@ namespace Moneyboard.Infrastructure.Data.Repositories
         // перенести в окремий репозиторій або узагальнити
         public async Task<BankCard> GetBankCardByProjectIdAsync(int projectId)
         {
-            // Знаходимо проект з включеною інформацією про банківську картку
             var project = _dbContext.Project
                 .Include(p => p.BankCard)
                 .FirstOrDefault(p => p.ProjectId == projectId);
@@ -123,7 +122,6 @@ namespace Moneyboard.Infrastructure.Data.Repositories
         public async Task<UserProject> GetUserProjectAsync(string userId, int projectId)
         {
 
-            // Виконайте запит до бази даних
             var userProject = await _dbContext.UserProject
                 .Where(up => up.UserId == userId && up.ProjectId == projectId)
                 .FirstOrDefaultAsync();
