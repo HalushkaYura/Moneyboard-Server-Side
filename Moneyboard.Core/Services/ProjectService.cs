@@ -115,8 +115,8 @@ namespace Moneyboard.Core.Services
                 IsDefolt = false,
             };
 
-            await _roleRepository.AddAsync(Member);
             await _roleRepository.AddAsync(Owner);
+            await _roleRepository.AddAsync(Member);          
             await _roleRepository.SaveChangesAsync();
             await CreateUserProject(userId, projectId, true, Owner);
         }
@@ -281,6 +281,7 @@ namespace Moneyboard.Core.Services
                 memberDTOs[i].ImageUrl = userDTO.ImageUrl;
                 memberDTOs[i].RoleName = roleDTO.RoleName;
                 memberDTOs[i].RolePoints = roleDTO.RolePoints;
+                memberDTOs[i].IsDefolt = roleDTO.IsDefolt;
             }
 
 

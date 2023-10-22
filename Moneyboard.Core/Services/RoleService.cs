@@ -65,7 +65,7 @@ namespace Moneyboard.Core.Services
         {
             var roles = await _roleRepository.GetAllAsync();
             bool roleExists = roles.Any(r => r.RoleName == roleEditDTO.RoleName && r.ProjectId == projectId);
-            if (roleExists.Equals(2))
+            if (roles.Count(r => r.RoleName == roleEditDTO.RoleName && r.ProjectId == projectId) >= 1)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Role already exist");
 
             var role = await _roleRepository.GetByKeyAsync(roleEditDTO.RoleId);
