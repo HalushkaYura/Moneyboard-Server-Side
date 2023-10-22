@@ -204,7 +204,11 @@ namespace Moneyboard.Core.Services
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
 
 
-            project = _mapper.Map(projectEditDTO, project);
+            project.Currency = projectEditDTO.Currency;
+            project.BaseSalary= projectEditDTO.BaseSalary;
+            project.Name= projectEditDTO.Name;
+            project.ProjectPoinPercent= projectEditDTO.ProjectPoinPercent;
+            project.SalaryDate = GetSalaryDate(projectEditDTO.SalaryDay);
 
 
             await _projectRepository.UpdateAsync(project);
@@ -340,41 +344,49 @@ namespace Moneyboard.Core.Services
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
 
             var projectMembers = await _userProjectRepository.GetListAsync(x => x.ProjectId == projectId);
-  
+            
             double totalPayments = projectMembers.Count()*project.BaseSalary;
             var bankCard = await _bankCardRepository.GetByKeyAsync(project.BankCardId);
 
             List <UserCalculatorPaymentDTO > memberList = new List<UserCalculatorPaymentDTO>();
             int allPoint = 0;
-            foreach(var member in projectMembers)
+            foreach (var member in projectMembers)
             {
-                var projectPaymentDTO = _mapper.Map<UserCalculatorPaymentDTO>(await _roleRepository.GetByKeyAsync(member.RoleId));
+                var projectPaymentDTO = new UserCalculatorPaymentDTO();
 
                 projectPaymentDTO.ProjectPoinPercent = project.ProjectPoinPercent;
                 projectPaymentDTO.PersonalPoints = member.PersonalPoints;
+
+                var role = await _roleRepository.GetByKeyAsync(member.RoleId);
+                projectPaymentDTO.RolePoints = role.RolePoints;
+
                 memberList.Add(projectPaymentDTO);
+
                 allPoint += projectPaymentDTO.RolePoints + projectPaymentDTO.PersonalPoints;
             }
 
-            for(int i = 0; i < projectMembers.Count(); i++)
+
+            if (totalPayments > bankCard.Money)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Not enough funds on the bank card");
+
+            for (int i = 0; i < projectMembers.Count(); i++)
             {
-                double memberPayment = CalculateMemberPayment(memberList[i], totalPayments - bankCard.Money, allPoint);
+                double memberPayment = CalculateMemberPayment(memberList[i], (bankCard.Money - totalPayments), allPoint);
                 totalPayments += memberPayment;
             }
             
-            if(totalPayments>bankCard.Money)
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Not many");
+
 
             return totalPayments;
         }
 
         private double CalculateMemberPayment(UserCalculatorPaymentDTO member, double money, int allPoint)
         {
-            double procentMoney = member.ProjectPoinPercent *money / 100;
+            double procentMoney = member.ProjectPoinPercent * money / 100;
             if (allPoint == 0)
                 return 0;
 
-            double paymentPoint = procentMoney * money * member.RolePoints / allPoint + procentMoney * member.PersonalPoints / allPoint;
+            double paymentPoint = procentMoney  * member.RolePoints / allPoint + procentMoney * member.PersonalPoints / allPoint;
 
             return paymentPoint;
         }

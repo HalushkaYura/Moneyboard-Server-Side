@@ -24,6 +24,8 @@ namespace Moneyboard.Core.Helpers
             CreateMap<ProjectCreateDTO, Project>().ReverseMap();
             CreateMap<Project, ProjectInfoDTO>()
                 .ForMember(dest => dest.PayDay, ops => ops.MapFrom(src => src.SalaryDate.Month));
+            CreateMap<Project, ProjectEditDTO>();
+
 
             CreateMap<ProjectForUserDTO, Project>().ReverseMap();
             CreateMap<Project, ProjectDetailsDTO>()
