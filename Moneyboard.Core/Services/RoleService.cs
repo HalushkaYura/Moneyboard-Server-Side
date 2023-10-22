@@ -46,11 +46,6 @@ namespace Moneyboard.Core.Services
             if (project == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
 
-            var roles = await _roleRepository.GetAllAsync();
-            bool roleExists = roles.Any(r => r.RoleName == "New role" && r.ProjectId == projectId);
-            if (roleExists)
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.FileNameAlreadyExist);
-
             var role = new Role
             {
                 IsDefolt = null,
