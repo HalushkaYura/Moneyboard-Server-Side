@@ -66,34 +66,7 @@ namespace Moneyboard.ServerSide.Controllers
             return Ok();
         }
 
-        [Authorize]
-        [HttpGet]
-        [Route("emails")]
-        public async Task<IActionResult> GetEmails([FromQuery] string email)
-        {
-            User user = await _authenticationService.GetAllUserEmailsAsync(email);
 
-            return Ok(user);
-        }
-
-        [Authorize]
-        [HttpPost]
-        [Route("login-two-step")]
-        public async Task<IActionResult> LoginTwoStepAsync([FromBody] UserTwoFactorDTO twoFactorDTO)
-        {
-            var tokens = await _authenticationService.LoginTwoStepAsync(twoFactorDTO);
-
-            return Ok(tokens);
-        }
-        [Authorize]
-        [HttpPost]
-        [Route("refresh-token")]
-        public async Task<IActionResult> RefreshTokenAsync([FromBody] UserAutorizationDTO userTokensDTO)
-        {
-            var tokens = await _authenticationService.RefreshTokenAsync(userTokensDTO);
-
-            return Ok(tokens);
-        }
         [Authorize]
         [HttpPut]
         [Route("password")]
@@ -103,6 +76,30 @@ namespace Moneyboard.ServerSide.Controllers
 
             return Ok();
         }
+
+        [Authorize]
+        [HttpPut]
+        [Route("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] UserSetNewPasswordDTO model)
+        {
+            await _authenticationService.ChangePasswordAsync(model, UserId);
+            return Ok(new { Message = "Password changed successfully." });
+
+
+        }
+
+
+        [Authorize]
+        [HttpPost]
+        [Route("refresh-token")]
+        public async Task<IActionResult> RefreshTokenAsync([FromBody] UserAutorizationDTO userTokensDTO)
+        {
+            var tokens = await _authenticationService.RefreshTokenAsync(userTokensDTO);
+
+            return Ok(tokens);
+        }
+        //----------------------------------------------------------------------------------------------------
+        /*
         [Authorize]
         [HttpPost]
         [Route("signin-google")]
@@ -111,15 +108,15 @@ namespace Moneyboard.ServerSide.Controllers
             var result = await _authenticationService.ExternalLoginAsync(authDTO);
             return Ok(result);
         }
-
         [Authorize]
         [HttpPost]
-        [Route("change-password")]
-        public async Task<IActionResult> ChangePassword([FromBody] UserSetNewPasswordDTO model)
+        [Route("login-two-step")]
+        public async Task<IActionResult> LoginTwoStepAsync([FromBody] UserTwoFactorDTO twoFactorDTO)
         {
-            await _authenticationService.ChangePasswordAsync(model, UserId);
-            return Ok(new { Message = "Password changed successfully." });
+            var tokens = await _authenticationService.LoginTwoStepAsync(twoFactorDTO);
 
-        }
+            return Ok(tokens);
+        }*/
+
     }
 }

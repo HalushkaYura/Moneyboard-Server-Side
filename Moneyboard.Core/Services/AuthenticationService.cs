@@ -319,17 +319,7 @@ namespace Moneyboard.Core.Services
 
         }
 
-        public async Task<User> GetAllUserEmailsAsync(string email)
-        {
-            var user = await _userManager.FindByEmailAsync(email);
 
-            if (user == null)
-            {
-                // Якщо користувача не знайдено, можливо, ви можете виконати обробку помилки
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
-            }
-            return user;
-        }
     }
     
 }

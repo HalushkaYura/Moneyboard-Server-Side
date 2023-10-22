@@ -24,10 +24,7 @@ namespace Moneyboard.Core.Interfaces.Repository
         Task<TEntity> GetEntityAsync(
               Expression<Func<TEntity, bool>> filter = null,
               string includeProperties = null);
-        Task<UserProject> GetUserProjectAsync(string userId, int projectId);
-
-        Task<BankCard> GetBankCardByProjectIdAsync(int projectId);
-        Task<BankCard> GetByCardNumberAsync(string cardNumber);
+    
 
         //Task DeleteRangeAsync(IEnumerable<TEntity> entities);
         //IQueryable<TEntity> Query(params Expression<Func<TEntity, object>>[] includes);

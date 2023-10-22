@@ -16,7 +16,6 @@ namespace Moneyboard.Core.Interfaces.Services
         Task SentResetPasswordTokenAsync(string userEmail);
         Task ResetPasswordAsync(UserChangePasswordDTO userChangePasswordDTO);
         Task<UserAuthResponseDTO> ExternalLoginAsync(UserExternalAuthDTO authDTO);
-        Task<User> GetAllUserEmailsAsync(string email);
 
         Task ChangePasswordAsync(UserSetNewPasswordDTO userSetPasswordDTO, string userId);
         //-----------------------------------------------------------------------------

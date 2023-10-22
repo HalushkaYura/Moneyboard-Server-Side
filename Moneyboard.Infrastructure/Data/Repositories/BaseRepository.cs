@@ -104,6 +104,7 @@ namespace Moneyboard.Infrastructure.Data.Repositories
             // Виконання запиту та отримання результатів
             return await query.ToListAsync();
         }
+
         public async Task<TEntity> GetEntityAsync(
     Expression<Func<TEntity, bool>> filter = null,
     string includeProperties = null)
@@ -127,43 +128,6 @@ namespace Moneyboard.Infrastructure.Data.Repositories
             // Виконання запиту та отримання результату (перший знайдений об'єкт або null)
             return await query.FirstOrDefaultAsync();
         }
-        // перенести в окремий репозиторій або узагальнити
-        public async Task<BankCard> GetBankCardByProjectIdAsync(int projectId)
-        {
-            var project = _dbContext.Project
-                .Include(p => p.BankCard)
-                .FirstOrDefault(p => p.ProjectId == projectId);
-
-            if (project != null)
-            {
-                return project.BankCard;
-            }
-
-            return null;
-        }
-        public async Task<UserProject> GetUserProjectAsync(string userId, int projectId)
-        {
-
-            var userProject = await _dbContext.UserProject
-                .Where(up => up.UserId == userId && up.ProjectId == projectId)
-                .FirstOrDefaultAsync();
-
-            return userProject;
-        }
-        public async Task<BankCard> GetByCardNumberAsync(string cardNumber)
-        {
-            if (typeof(TEntity) == typeof(BankCard))
-            {
-                var bankCardEntity = await _dbSet.SingleOrDefaultAsync(x => ((BankCard)(object)x).CardNumber == cardNumber);
-                return bankCardEntity as BankCard;
-            }
-            else
-            {
-                throw new ArgumentException("GetByCardNumberAsync can only be used with BankCard entities.");
-            }
-        }
-
-
 
     }
 }

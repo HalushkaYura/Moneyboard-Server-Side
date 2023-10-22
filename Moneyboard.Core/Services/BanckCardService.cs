@@ -44,9 +44,10 @@ namespace Moneyboard.Core.Services
 
         public async Task EditBankCardDateAsync(BankCardEditDTO banckCardEditDTO, int projectId, string userId)
         {
-            var project = await _projectRepository.GetByKeyAsync(projectId );
-
-            var bankCard = await _bankCardBaseRepository.GetBankCardByProjectIdAsync(projectId);
+            var project = await _projectRepository.GetByKeyAsync(projectId);
+            if(project == null)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
+            var bankCard = await _bankCardBaseRepository.GetByKeyAsync(project.BankCardId);
 
             if (bankCard == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.AttachmentNotFound);
@@ -60,11 +61,13 @@ namespace Moneyboard.Core.Services
 
         public async Task<BankCardInfoDTO> InfoBankCardAsync(int projectId, string userId)
         {
-            var userProject = await _userProjectRepository.GetListAsync(up => up.ProjectId == projectId && up.UserId == userId);
-            if (userProject == null || userProject.First().IsOwner == false)
+            var userProject = await _userProjectRepository.GetEntityAsync(up => up.ProjectId == projectId && up.UserId == userId);
+            if (userProject == null || userProject.IsOwner == false)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.AttachmentNotFound);
 
-            var bankCard = await _bankCardBaseRepository.GetBankCardByProjectIdAsync(projectId);
+            var project = await _projectRepository.GetByKeyAsync(projectId);
+
+            var bankCard = await _bankCardBaseRepository.GetByKeyAsync(project.BankCardId);
             if (bankCard == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.AttachmentNotFound);
 

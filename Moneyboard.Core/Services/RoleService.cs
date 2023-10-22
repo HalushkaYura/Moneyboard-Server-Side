@@ -91,15 +91,14 @@ namespace Moneyboard.Core.Services
             if (user == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
 
-            var userProjects = await _userProjectRepository.GetListAsync(x => x.UserId == roleAssignmentRoleDTO.UserId && x.ProjectId == roleAssignmentRoleDTO.ProjectId);
-            if (!userProjects.Any())
+            var userProject = await _userProjectRepository.GetEntityAsync(x => x.UserId == roleAssignmentRoleDTO.UserId && x.ProjectId == roleAssignmentRoleDTO.ProjectId);
+            if (userProject == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotMember);
 
             var role = await _roleRepository.GetByKeyAsync(roleAssignmentRoleDTO.RoleId);
             if (role == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Role not foud");
 
-            var userProject = userProjects.First();
             userProject.RoleId = roleAssignmentRoleDTO.RoleId;
             await _userProjectRepository.UpdateAsync(userProject);
             await _userProjectRepository.SaveChangesAsync();
@@ -118,13 +117,13 @@ namespace Moneyboard.Core.Services
         public async Task DeleteRoleAsync(int roleId, string userId)
         {
             var role = await _roleRepository.GetByKeyAsync(roleId);
-            if (role == null || role.IsDefolt!=null)
+            if (role == null || role.IsDefolt != null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "The action cannot be performed");
 
-            var userProject = await _userProjectRepository.GetUserProjectAsync(userId, role.ProjectId);
+            var userProject = await _userProjectRepository.GetEntityAsync(x => x.UserId == userId && x.RoleId == role.ProjectId);
             if (userProject == null || userProject.IsOwner != true)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Not enough rights");
-            
+
             await AutoAssignDefaultRoleAsync(roleId, role.ProjectId);
             await _roleRepository.DeleteAsync(role);
             await _roleRepository.SaveChangesAsync();

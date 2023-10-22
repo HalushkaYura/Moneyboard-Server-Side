@@ -77,7 +77,7 @@ namespace Moneyboard.Core.Services
             project.CreateDate = DateTime.Now;
             project.SalaryDate = GetSalaryDate(projectDTO.SalaryDay);
 
-            if (await _bankCardBaseRepository.GetByCardNumberAsync(projectDTO.CardNumber) == null)
+            if (await _bankCardBaseRepository.GetEntityAsync(x => x.CardNumber == projectDTO.CardNumber) == null)
             {
                 project.BankCard = bankcard;
                 await _bankCardBaseRepository.AddAsync(bankcard);
@@ -85,7 +85,7 @@ namespace Moneyboard.Core.Services
             }
             else
             {
-                project.BankCard = await _bankCardBaseRepository.GetByCardNumberAsync(projectDTO.CardNumber);
+                project.BankCard = await _bankCardBaseRepository.GetEntityAsync(x => x.CardNumber == projectDTO.CardNumber);
                 await _bankCardBaseRepository.SaveChangesAsync();
             }
 
@@ -146,7 +146,7 @@ namespace Moneyboard.Core.Services
 
             if (user == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
-            
+
             var existingUserProject = await _userProjectRepository.GetListAsync(up => up.UserId == userId && up.ProjectId == projectId);
             if (existingUserProject.Any())
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "User is already a member of this project.");
@@ -186,7 +186,7 @@ namespace Moneyboard.Core.Services
             if (project == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
 
-            var userProject = await _userProjectRepository.GetUserProjectAsync(userId, projectId);
+            var userProject = await _userProjectRepository.GetEntityAsync(x => x.UserId == userId && x.ProjectId == projectId);
             bool? isOwner;
             if (userProject == null)
                 isOwner = null;
@@ -256,7 +256,7 @@ namespace Moneyboard.Core.Services
         }
         public async Task<ProjectDetailsDTO> GetProjectDetailsAsync(int projectId, string userId)
         {
-            var userProjectTest = await _userProjectRepository.GetUserProjectAsync(userId, projectId);
+            var userProjectTest = await _userProjectRepository.GetEntityAsync(x => x.UserId == userId && x.ProjectId == projectId);
             if (userProjectTest == null || userProjectTest.IsOwner == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
 
@@ -300,8 +300,8 @@ namespace Moneyboard.Core.Services
             var project = await _projectRepository.GetByKeyAsync(projectId);
             if (project == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
-            
-            var userProject = await _userProjectRepository.GetUserProjectAsync(userId, projectId);
+
+            var userProject = await _userProjectRepository.GetEntityAsync(x => x.UserId == userId && x.ProjectId == projectId);
             if (userProject == null || userProject.IsOwner != true)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Not enough rights");
 
@@ -314,7 +314,7 @@ namespace Moneyboard.Core.Services
             var project = await _projectRepository.GetByKeyAsync(projectId);
             if (project == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
-            var userProject = await _userProjectRepository.GetUserProjectAsync(userId, projectId);
+            var userProject = await _userProjectRepository.GetEntityAsync(x => x.UserId == userId && x.ProjectId == projectId);
 
             if (userProject == null || userProject.IsOwner == true)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Impossible action");
