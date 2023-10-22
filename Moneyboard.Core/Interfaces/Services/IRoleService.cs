@@ -6,7 +6,7 @@ namespace Moneyboard.Core.Interfaces.Services
     {
         Task CreateNewRoleAsync(int projectId);
         Task EditRoleDateAsync(RoleEditDTO roleEditDTO);
-        Task AssignRoleToProjectMemberAsync(string userId, int projectId, int roleId);
+        Task AssignRoleToProjectMemberAsync(RoleAssignmentRoleDTO roleAssignmentRoleDTO);
         Task<List<RoleInfoDTO>> GetRolesByProjectIdAsync(int projectId);
         Task DeleteRoleAsync(int roleId, string userId);
     }

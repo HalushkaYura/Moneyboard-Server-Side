@@ -34,10 +34,10 @@ namespace Moneyboard.ServerSide.Controllers
         [Authorize]
         [HttpPost]
         [Route("role-assignment")]
-        public async Task<IActionResult> AssignRoleToProjectMember(string userId, int projectId, int roleId)
+        public async Task<IActionResult> AssignRoleToProjectMember([FromBody] RoleAssignmentRoleDTO roleAssignmentRoleDTO)
         {
 
-            await _roleService.AssignRoleToProjectMemberAsync(userId, projectId, roleId);
+            await _roleService.AssignRoleToProjectMemberAsync(roleAssignmentRoleDTO);
             return Ok();
         }
 

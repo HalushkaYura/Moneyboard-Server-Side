@@ -104,7 +104,29 @@ namespace Moneyboard.Infrastructure.Data.Repositories
             // Виконання запиту та отримання результатів
             return await query.ToListAsync();
         }
+        public async Task<TEntity> GetEntityAsync(
+    Expression<Func<TEntity, bool>> filter = null,
+    string includeProperties = null)
+        {
+            // Створення запиту до бази даних на основі параметрів
+            IQueryable<TEntity> query = _dbContext.Set<TEntity>();
 
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (includeProperties != null)
+            {
+                foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeProperty);
+                }
+            }
+
+            // Виконання запиту та отримання результату (перший знайдений об'єкт або null)
+            return await query.FirstOrDefaultAsync();
+        }
         // перенести в окремий репозиторій або узагальнити
         public async Task<BankCard> GetBankCardByProjectIdAsync(int projectId)
         {

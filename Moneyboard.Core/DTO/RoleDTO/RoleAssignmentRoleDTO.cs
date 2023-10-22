@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace Moneyboard.Core.DTO.RoleDTO
 {
-    public class RoleInfoDTO
+    public class RoleAssignmentRoleDTO
     {
+        public string UserId { get; set; }
         public int RoleId { get; set; }
-        public string RoleName { get; set; }
-        public int RolePoints { get; set; }
-        public bool? IsDefolt { get; set; }
+        public int ProjectId { get; set; }
     }
 }

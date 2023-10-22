@@ -91,11 +91,42 @@ namespace Moneyboard.Core.Services
 
             await _projectRepository.AddAsync(project);
             await _projectRepository.SaveChangesAsync();
-            await CreateUserProjectAndRole(userId, project.ProjectId, "Owner", true);
+            await CreateNewRole(project.ProjectId, userId);
 
             return new ProjectIdDTO { ProjectId = project.ProjectId };
         }
 
+        private async Task CreateNewRole(int projectId, string userId)
+        {
+            var project = await _projectRepository.GetByKeyAsync(projectId);
+            if (project == null)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
+
+            Role Owner;
+            Owner = new Role
+            {
+                RoleName = "Owner",
+                RolePoints = 0,
+                CreateDate = DateTime.Now.Date,
+                ProjectId = projectId,
+                IsDefolt = true,
+            };
+
+            Role Member;
+            Member = new Role
+            {
+                RoleName = "Member",
+                RolePoints = 0,
+                CreateDate = DateTime.Now.Date,
+                ProjectId = projectId,
+                IsDefolt = false,
+            };
+
+            await _roleRepository.AddAsync(Member);
+            await _roleRepository.AddAsync(Owner);
+            await _roleRepository.SaveChangesAsync();
+            await CreateUserProject(userId, projectId, true, Owner);
+        }
         private DateTime GetSalaryDate(int salaryDay)
         {
             DateTime today = DateTime.Today;
@@ -115,48 +146,25 @@ namespace Moneyboard.Core.Services
 
             if (user == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
+            
             var existingUserProject = await _userProjectRepository.GetListAsync(up => up.UserId == userId && up.ProjectId == projectId);
-
             if (existingUserProject.Any())
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "User is already a member of this project.");
 
-            await CreateUserProjectAndRole(userId, projectId, "Member", false);
+            var role = await _roleRepository.GetEntityAsync(x => x.ProjectId == projectId && x.IsDefolt == false);
+            if (role == null)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Role not found.");
+
+            await CreateUserProject(userId, projectId, false, role);
 
         }
 
-        private async Task CreateUserProjectAndRole(string userId, int projectId, string name, bool isOwner)
+        private async Task CreateUserProject(string userId, int projectId, bool isOwner, Role role)
         {
             var project = await _projectRepository.GetByKeyAsync(projectId);
 
             if (project == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
-
-            var existingMemberRole = await _roleRepository.GetListAsync(
-            r => r.RoleName == name && r.ProjectId == projectId);
-
-            Role role;
-
-            if (existingMemberRole.Any())
-            {
-                role = existingMemberRole.First();
-            }
-            else
-            {
-                role = new Role
-                {
-                    RoleName = name,
-                    RolePoints = 0,
-                    CreateDate = DateTime.Now.Date,
-                    ProjectId = projectId,
-                };
-                if (name == "Owner")
-                    role.IsDefolt = true;
-                else
-                    role.IsDefolt = false;
-
-                await _roleRepository.AddAsync(role);
-                await _roleRepository.SaveChangesAsync();
-            }
 
             var userProject = new UserProject
             {
@@ -175,7 +183,6 @@ namespace Moneyboard.Core.Services
         public async Task<ProjectInfoDTO> InfoFromProjectAsync(int projectId, string userId)
         {
             var project = await _projectRepository.GetByKeyAsync(projectId);
-
             if (project == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
 
@@ -189,6 +196,10 @@ namespace Moneyboard.Core.Services
             var projectInfo = _mapper.Map<ProjectInfoDTO>(project);
             projectInfo.IsOwner = isOwner;
 
+            var userProjectOwer = await _userProjectRepository.GetEntityAsync(x => x.ProjectId == projectId && x.IsOwner == true);
+            var userOwner = await _userRepository.GetByKeyAsync(userProjectOwer.UserId);
+            projectInfo.OwnerName = userOwner.Firstname + " " + userOwner.Lastname;
+            projectInfo.OwnerURL = userOwner.ImageUrl;
             return projectInfo;
         }
 
@@ -246,7 +257,7 @@ namespace Moneyboard.Core.Services
         public async Task<ProjectDetailsDTO> GetProjectDetailsAsync(int projectId, string userId)
         {
             var userProjectTest = await _userProjectRepository.GetUserProjectAsync(userId, projectId);
-            if (userProjectTest == null || userProjectTest.IsOwner ==null)
+            if (userProjectTest == null || userProjectTest.IsOwner == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
 
             var project = await _projectRepository.GetByKeyAsync(projectId);
@@ -289,8 +300,9 @@ namespace Moneyboard.Core.Services
             var project = await _projectRepository.GetByKeyAsync(projectId);
             if (project == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
-            var userProject = await _userProjectRepository.GetUserProjectAsync(userId,projectId);
-            if (userProject == null || userProject.IsOwner !=true)
+            
+            var userProject = await _userProjectRepository.GetUserProjectAsync(userId, projectId);
+            if (userProject == null || userProject.IsOwner != true)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Not enough rights");
 
             await _projectRepository.DeleteAsync(project);
@@ -321,7 +333,7 @@ namespace Moneyboard.Core.Services
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
 
             project.ProjectPoinPercent = projectPointDTO.ProjectPoinPercent;
-            
+
             await _projectRepository.UpdateAsync(project);
             await _projectRepository.SaveChangesAsync();
 

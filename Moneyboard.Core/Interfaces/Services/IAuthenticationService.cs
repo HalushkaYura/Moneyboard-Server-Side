@@ -8,6 +8,8 @@ namespace Moneyboard.Core.Interfaces.Services
     {
         Task RegistrationAsync(User user, string password, string roleName);
         Task<UserAutorizationDTO> LoginAsync(string email, string password);
+
+
         Task<UserAutorizationDTO> RefreshTokenAsync(UserAutorizationDTO userTokensDTO);
         Task LogoutAsync(UserAutorizationDTO userTokensDTO);
         Task<UserAutorizationDTO> LoginTwoStepAsync(UserTwoFactorDTO twoFactorDTO);
@@ -15,5 +17,9 @@ namespace Moneyboard.Core.Interfaces.Services
         Task ResetPasswordAsync(UserChangePasswordDTO userChangePasswordDTO);
         Task<UserAuthResponseDTO> ExternalLoginAsync(UserExternalAuthDTO authDTO);
         Task<User> GetAllUserEmailsAsync(string email);
+
+
+        //-----------------------------------------------------------------------------
+
     }
 }

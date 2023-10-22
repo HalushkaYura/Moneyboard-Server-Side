@@ -20,6 +20,8 @@ namespace Moneyboard.Core.DTO.ProjectDTO
         public int PayDay { get; set; }
         public bool? IsOwner { get; set; }
 
+        public string OwnerName{ get; set; }
+        public string OwnerURL { get; set; }
 
     }
 }

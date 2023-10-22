@@ -53,10 +53,10 @@ namespace Moneyboard.Core.Services
 
             var role = new Role
             {
-                IsDefolt = false,
+                //IsDefolt = null,
                 Project = project,
                 RoleName = "New role",
-                RolePoints = 0
+                RolePoints = 0,
 
             };
 
@@ -68,8 +68,13 @@ namespace Moneyboard.Core.Services
 
         public async Task EditRoleDateAsync(RoleEditDTO roleEditDTO)
         {
+            var roles = await _roleRepository.GetAllAsync();
+            bool roleExists = roles.Any(r => r.RoleName == roleEditDTO.RoleName && r.ProjectId == roleEditDTO.ProjectId);
+            if (roleExists)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.FileNameAlreadyExist);
+
             var role = await _roleRepository.GetByKeyAsync(roleEditDTO.RoleId);
-            if(role == null)
+            if (role == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Role not found");
 
             role.RoleName = roleEditDTO.RoleName;
@@ -80,21 +85,24 @@ namespace Moneyboard.Core.Services
             await _roleRepository.SaveChangesAsync();
         }
 
-        public async Task AssignRoleToProjectMemberAsync(string userId, int projectId, int roleId)
+        public async Task AssignRoleToProjectMemberAsync(RoleAssignmentRoleDTO roleAssignmentRoleDTO)
         {
-            var user = await _userManager.FindByIdAsync(userId);
-
+            var user = await _userRepository.GetByKeyAsync(roleAssignmentRoleDTO.UserId);
             if (user == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
 
-
-            var userProject = await _userProjectRepository.GetByPairOfKeysAsync(userId, projectId);
-
-            if (userProject == null)
+            var userProjects = await _userProjectRepository.GetListAsync(x => x.UserId == roleAssignmentRoleDTO.UserId && x.ProjectId == roleAssignmentRoleDTO.ProjectId);
+            if (!userProjects.Any())
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotMember);
 
+            var role = await _roleRepository.GetByKeyAsync(roleAssignmentRoleDTO.RoleId);
+            if (role == null)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Role not foud");
 
-            userProject.Role = await _roleRepository.GetByKeyAsync(roleId);
+            var userProject = userProjects.First();
+            userProject.RoleId = roleAssignmentRoleDTO.RoleId;
+            await _userProjectRepository.UpdateAsync(userProject);
+            await _userProjectRepository.SaveChangesAsync();
         }
         public async Task<List<RoleInfoDTO>> GetRolesByProjectIdAsync(int projectId)
         {
@@ -110,15 +118,32 @@ namespace Moneyboard.Core.Services
         public async Task DeleteRoleAsync(int roleId, string userId)
         {
             var role = await _roleRepository.GetByKeyAsync(roleId);
-            if (role == null)
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Role not found");
+            if (role == null || role.IsDefolt!=null)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "The action cannot be performed");
 
             var userProject = await _userProjectRepository.GetUserProjectAsync(userId, role.ProjectId);
             if (userProject == null || userProject.IsOwner != true)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Not enough rights");
-
+            
+            await AutoAssignDefaultRoleAsync(roleId, role.ProjectId);
             await _roleRepository.DeleteAsync(role);
             await _roleRepository.SaveChangesAsync();
+        }
+
+        private async Task AutoAssignDefaultRoleAsync(int roleId, int projectId)
+        {
+            var usersWithDeletedRole = await _userProjectRepository.GetListAsync(x => x.RoleId == roleId && x.ProjectId == projectId);
+
+            var defaultRole = await _roleRepository.GetEntityAsync(x => x.ProjectId == projectId && x.IsDefolt == false);
+
+            foreach (var userProject in usersWithDeletedRole)
+            {
+                userProject.Role = defaultRole;
+                userProject.RoleId = defaultRole.RoleId;
+                await _userProjectRepository.UpdateAsync(userProject);
+            }
+
+            await _userProjectRepository.SaveChangesAsync();
         }
     }
 }

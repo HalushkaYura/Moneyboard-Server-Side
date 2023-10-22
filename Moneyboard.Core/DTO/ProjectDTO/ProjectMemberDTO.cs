@@ -15,6 +15,7 @@ namespace Moneyboard.Core.DTO.ProjectDTO
         public string RoleName { get; set; }
         public int RolePoints { get; set; }
         public int PersonalPoints { get; set; }
-        public bool IsOwner { get; set; }
+        public bool? IsOwner { get; set; }
+        public bool? IsDefolt { get; set; }
     }
 }

@@ -21,7 +21,9 @@ namespace Moneyboard.Core.Interfaces.Repository
             Func<IQueryable<TEntity>,
             IOrderedQueryable<TEntity>> orderBy = null,
             string includeProperties = null);
-
+        Task<TEntity> GetEntityAsync(
+              Expression<Func<TEntity, bool>> filter = null,
+              string includeProperties = null);
         Task<UserProject> GetUserProjectAsync(string userId, int projectId);
 
         Task<BankCard> GetBankCardByProjectIdAsync(int projectId);
