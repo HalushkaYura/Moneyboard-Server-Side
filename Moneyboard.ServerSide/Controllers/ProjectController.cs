@@ -141,5 +141,14 @@ namespace Moneyboard.ServerSide.Controllers
             await _projectService.LeaveTheProjectAsync(projectId, UserId);
             return Ok();
         }
+
+        [Authorize]
+        [HttpGet]
+        [Route("calculate-total-payments/{projectId}")]
+        public async Task<IActionResult> CalculateTotalPayments(int projectId)
+        {
+            var totalPayments = await _projectService.CalculateTotalPayments(projectId);
+            return Ok(totalPayments);
+        }
     }
 }

@@ -53,7 +53,7 @@ namespace Moneyboard.Core.Services
 
             var role = new Role
             {
-                //IsDefolt = null,
+                IsDefolt = null,
                 Project = project,
                 RoleName = "New role",
                 RolePoints = 0,
@@ -66,12 +66,12 @@ namespace Moneyboard.Core.Services
             await _roleRepository.SaveChangesAsync();
         }
 
-        public async Task EditRoleDateAsync(RoleEditDTO roleEditDTO)
+        public async Task EditRoleDateAsync(RoleEditDTO roleEditDTO, int projectId)
         {
             var roles = await _roleRepository.GetAllAsync();
-            bool roleExists = roles.Any(r => r.RoleName == roleEditDTO.RoleName && r.ProjectId == roleEditDTO.ProjectId);
-            if (roleExists)
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.FileNameAlreadyExist);
+            bool roleExists = roles.Any(r => r.RoleName == roleEditDTO.RoleName && r.ProjectId == projectId);
+            if (roleExists.Equals(2))
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Role already exist");
 
             var role = await _roleRepository.GetByKeyAsync(roleEditDTO.RoleId);
             if (role == null)

@@ -19,7 +19,6 @@ namespace Moneyboard.Infrastructure
 
         }
     
-
         public static void AddDbContext(this IServiceCollection services, string connectionString)
         {
             services.AddDbContext<MoneyboardDb>(options => options.UseSqlServer(connectionString));

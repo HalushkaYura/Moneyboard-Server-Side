@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <None Include="wwwroot\1.png" />
-    <None Include="wwwroot\png-transparent-computer-icons-avatar-avatar-angle-heroes-recruiter-thumbnail.png" />
   </ItemGroup>
 
   <ItemGroup>

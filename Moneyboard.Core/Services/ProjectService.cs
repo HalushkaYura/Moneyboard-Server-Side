@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using AutoMapper.Execution;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Moneyboard.Core.DTO.ProjectDTO;
+using Moneyboard.Core.DTO.UserDTO;
 using Moneyboard.Core.Entities.BankCardEntity;
 using Moneyboard.Core.Entities.ProjectEntity;
 using Moneyboard.Core.Entities.RoleEntity;
@@ -20,15 +22,13 @@ namespace Moneyboard.Core.Services
         protected readonly IMapper _mapper;
         protected readonly UserManager<User> _userManager;
         protected IRepository<Project> _projectRepository;
-        protected IRepository<BankCard> _bankCardBaseRepository;
-        //protected IBankCardRepository _bankCardRepository;
+        protected IRepository<BankCard> _bankCardRepository;
         protected readonly IHttpContextAccessor _httpContextAccessor;
         protected readonly IRoleService _roleService;
         protected readonly IRepository<UserProject> _userProjectRepository;
         protected readonly IRepository<User> _userRepository;
         protected readonly IRepository<Role> _roleRepository;
-        //protected readonly IProjectRepository _projectBaseRepository;
-        //protected readonly IUserProjectRepository _userProjectBaseRepository;
+
         public ProjectService(
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
@@ -38,24 +38,17 @@ namespace Moneyboard.Core.Services
             IRepository<User> userRepository,
             IRepository<Role> roleRepository,
             IRepository<UserProject> userProjectRepository,
-            UserManager<User> userManager
-                                                    //IProjectRepository projectBaseRepository,
-                                                    //IUserProjectRepository userProjectBaseRepository
-                                                    //IBankCardRepository bankCardRepository
-                                                    )
+            UserManager<User> userManager)
         {
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
             _projectRepository = projectRepository;
-            _bankCardBaseRepository = bankCardBaseRepository;
+            _bankCardRepository = bankCardBaseRepository;
             _roleService = roleService;
             _userProjectRepository = userProjectRepository;
             _userRepository = userRepository;
             _userManager = userManager;
             _roleRepository = roleRepository;
-            //_projectBaseRepository = projectBaseRepository;
-            //_userProjectRepository = userProjectBaseRepository;
-            //_bankCardRepository = bankCardRepository;
         }
 
 
@@ -77,16 +70,16 @@ namespace Moneyboard.Core.Services
             project.CreateDate = DateTime.Now;
             project.SalaryDate = GetSalaryDate(projectDTO.SalaryDay);
 
-            if (await _bankCardBaseRepository.GetEntityAsync(x => x.CardNumber == projectDTO.CardNumber) == null)
+            if (await _bankCardRepository.GetEntityAsync(x => x.CardNumber == projectDTO.CardNumber) == null)
             {
                 project.BankCard = bankcard;
-                await _bankCardBaseRepository.AddAsync(bankcard);
-                await _bankCardBaseRepository.SaveChangesAsync();
+                await _bankCardRepository.AddAsync(bankcard);
+                await _bankCardRepository.SaveChangesAsync();
             }
             else
             {
-                project.BankCard = await _bankCardBaseRepository.GetEntityAsync(x => x.CardNumber == projectDTO.CardNumber);
-                await _bankCardBaseRepository.SaveChangesAsync();
+                project.BankCard = await _bankCardRepository.GetEntityAsync(x => x.CardNumber == projectDTO.CardNumber);
+                await _bankCardRepository.SaveChangesAsync();
             }
 
             await _projectRepository.AddAsync(project);
@@ -337,6 +330,52 @@ namespace Moneyboard.Core.Services
             await _projectRepository.UpdateAsync(project);
             await _projectRepository.SaveChangesAsync();
 
+        }
+
+        public async Task<double> CalculateTotalPayments(int projectId)
+        {
+            var project = await _projectRepository.GetByKeyAsync(projectId);
+            if (project == null)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
+
+            var projectMembers = await _userProjectRepository.GetListAsync(x => x.ProjectId == projectId);
+  
+            double totalPayments = projectMembers.Count()*project.BaseSalary;
+            var bankCard = await _bankCardRepository.GetByKeyAsync(project.BankCardId);
+
+            List <UserCalculatorPaymentDTO > memberList = new List<UserCalculatorPaymentDTO>();
+            int allPoint = 0;
+            foreach(var member in projectMembers)
+            {
+                var projectPaymentDTO = _mapper.Map<UserCalculatorPaymentDTO>(await _roleRepository.GetByKeyAsync(member.RoleId));
+
+                projectPaymentDTO.ProjectPoinPercent = project.ProjectPoinPercent;
+                projectPaymentDTO.PersonalPoints = member.PersonalPoints;
+                memberList.Add(projectPaymentDTO);
+                allPoint += projectPaymentDTO.RolePoints + projectPaymentDTO.PersonalPoints;
+            }
+
+            for(int i = 0; i < projectMembers.Count(); i++)
+            {
+                double memberPayment = CalculateMemberPayment(memberList[i], totalPayments - bankCard.Money, allPoint);
+                totalPayments += memberPayment;
+            }
+            
+            if(totalPayments>bankCard.Money)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Not many");
+
+            return totalPayments;
+        }
+
+        private double CalculateMemberPayment(UserCalculatorPaymentDTO member, double money, int allPoint)
+        {
+            double procentMoney = member.ProjectPoinPercent *money / 100;
+            if (allPoint == 0)
+                return 0;
+
+            double paymentPoint = procentMoney * money * member.RolePoints / allPoint + procentMoney * member.PersonalPoints / allPoint;
+
+            return paymentPoint;
         }
     }
 }

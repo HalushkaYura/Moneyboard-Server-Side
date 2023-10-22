@@ -11,7 +11,7 @@
             public int RoleId { get; set; }
             public string RoleName { get; set; }
             public int RolePoints { get; set; }
-            public int ProjectId { get; set; }
+
 
     }
     }

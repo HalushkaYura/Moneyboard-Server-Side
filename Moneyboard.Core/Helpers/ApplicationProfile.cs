@@ -17,14 +17,14 @@ namespace Moneyboard.Core.Helpers
         {
 
             CreateMap<User, UserChangeInfoDTO>().ReverseMap();
-            CreateMap<UserRegistrationDTO, User>().ReverseMap(); 
+            CreateMap<UserRegistrationDTO, User>().ReverseMap();
             CreateMap<User, UserChangeInfoDTO>();
 
             CreateMap<ProjectCreateDTO, BankCard>().ReverseMap();
             CreateMap<ProjectCreateDTO, Project>().ReverseMap();
             CreateMap<Project, ProjectInfoDTO>()
                 .ForMember(dest => dest.PayDay, ops => ops.MapFrom(src => src.SalaryDate.Month));
-            
+
             CreateMap<ProjectForUserDTO, Project>().ReverseMap();
             CreateMap<Project, ProjectDetailsDTO>()
                  .ForMember(dest => dest.ProjectPointPercent, opt => opt.MapFrom(src => src.ProjectPoinPercent));
@@ -41,6 +41,9 @@ namespace Moneyboard.Core.Helpers
 
             CreateMap<BankCardEditDTO, BankCard>().ReverseMap();
             CreateMap<BankCard, BankCardInfoDTO>();
+
+            CreateMap<Role, UserCalculatorPaymentDTO>();
+
 
 
             /*CreateMap<InviteUser, UserInviteInfoDTO>()

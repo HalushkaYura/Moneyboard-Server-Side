@@ -43,10 +43,10 @@ namespace Moneyboard.ServerSide.Controllers
 
         [Authorize]
         [HttpPut]
-        [Route("edit")]
-        public async Task<IActionResult> EditRole([FromBody] RoleEditDTO roleEditDTO)
+        [Route("edit/{projectId}")]
+        public async Task<IActionResult> EditRole([FromBody] RoleEditDTO roleEditDTO, int projectId)
         {
-            await _roleService.EditRoleDateAsync(roleEditDTO);
+            await _roleService.EditRoleDateAsync(roleEditDTO, projectId);
             return Ok();
         }
 
