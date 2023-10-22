@@ -191,7 +191,7 @@ namespace Moneyboard.Core.Services
 
             if (!System.IO.File.Exists(Path.Combine(_webHostEnvironment.WebRootPath, "images/users", user.ImageUrl)))
             {
-                imageUrl = string.Empty; // Опціонально: якщо файл не знайдено, повертати порожній URL або якийсь інший значок для "фото не знайдено".
+                imageUrl = string.Empty; 
             }
 
             return imageUrl;

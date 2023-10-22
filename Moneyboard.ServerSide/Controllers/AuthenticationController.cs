@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moneyboard.Core.DTO.UserDTO;
 using Moneyboard.Core.Entities.UserEntity;
 using Moneyboard.Core.Roles;
+using System.Security.Claims;
 
 namespace Moneyboard.ServerSide.Controllers
 {
@@ -11,6 +12,7 @@ namespace Moneyboard.ServerSide.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly Core.Interfaces.Services.IAuthenticationService _authenticationService;
+        private string UserId => User.FindFirst(ClaimTypes.NameIdentifier).Value;
         public AuthenticationController(Core.Interfaces.Services.IAuthenticationService authenticationService)
         {
             _authenticationService = authenticationService;
@@ -110,7 +112,14 @@ namespace Moneyboard.ServerSide.Controllers
             return Ok(result);
         }
 
+        [Authorize]
+        [HttpPost]
+        [Route("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] UserSetNewPasswordDTO model)
+        {
+            await _authenticationService.ChangePasswordAsync(model, UserId);
+            return Ok(new { Message = "Password changed successfully." });
 
-
+        }
     }
 }

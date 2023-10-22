@@ -303,6 +303,22 @@ namespace Moneyboard.Core.Services
 
 
 
+
+
+
+
+
+        public async Task ChangePasswordAsync(UserSetNewPasswordDTO userSetPasswordDTO, string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
+
+            await _userManager.ChangePasswordAsync(user, userSetPasswordDTO.CurrentPassword, userSetPasswordDTO.NewPassword);
+
+        }
+
         public async Task<User> GetAllUserEmailsAsync(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
@@ -314,6 +330,6 @@ namespace Moneyboard.Core.Services
             }
             return user;
         }
-
     }
+    
 }
