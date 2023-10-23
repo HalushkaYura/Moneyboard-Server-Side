@@ -14,6 +14,7 @@ namespace Moneyboard.Core.Validation
         {
             RuleFor(dto => dto.Name)
                  .NotEmpty()
+                 .NotNull()
                  .MaximumLength(255);
 
             RuleFor(dto => dto.BaseSalary)
@@ -26,6 +27,11 @@ namespace Moneyboard.Core.Validation
 
             RuleFor(dto => dto.Currency)
                 .NotEmpty()
+                .NotNull();
+            RuleFor(dto => dto.ProjectPoinPercent)
+                .NotEmpty()
+                .NotNull()
+                .GreaterThan(0)
                 .NotNull();
         }
 
