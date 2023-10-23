@@ -150,5 +150,14 @@ namespace Moneyboard.ServerSide.Controllers
             var totalPayments = await _projectService.CalculateTotalPayments(projectId);
             return Ok(totalPayments);
         }
+
+        [Authorize]
+        [HttpPost]
+        [Route("process-salary/{projectId}")]
+        public async Task<IActionResult> ProcessSalary(int projectId)
+        {
+            await _projectService.ProccesSalary(projectId);
+            return Ok("Salary processed successfully.");
+        }
     }
 }

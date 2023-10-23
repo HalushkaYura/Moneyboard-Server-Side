@@ -14,13 +14,11 @@ namespace Moneyboard.Core.Validation
         public RoleEditValidation()
         {
             RuleFor(dto => dto.RoleName)
-                .NotNull()
                 .NotEmpty()
                 .MaximumLength(30);
 
             RuleFor(dto => dto.RolePoints)
                 .NotEmpty()
-                .NotNull()
                 .GreaterThanOrEqualTo(0);
 
 

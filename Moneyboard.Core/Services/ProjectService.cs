@@ -390,5 +390,32 @@ namespace Moneyboard.Core.Services
 
             return paymentPoint;
         }
+  
+    
+        public async Task ProccesSalary(int projectId)
+        {
+            var project = await _projectRepository.GetByKeyAsync(projectId);
+            if (project == null)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
+
+            DateTime today = DateTime.Now;
+            if (today != project.SalaryDate.Date)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Today is not a payday.");
+
+            var projectMembers = await _userProjectRepository.GetListAsync(x => x.ProjectId == projectId);
+            double totalPayments = await CalculateTotalPayments(projectId);
+            var bankCard = await _bankCardRepository.GetByKeyAsync(project.BankCardId);
+
+            if (totalPayments > bankCard.Money)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Not enough funds on the bank card");
+
+            bankCard.Money -= totalPayments;
+            project.SalaryDate = project.SalaryDate.AddMonths(1);
+
+            await _projectRepository.UpdateAsync(project);
+            await _projectRepository.SaveChangesAsync();
+            await _bankCardRepository.UpdateAsync(bankCard);
+            await _bankCardRepository.SaveChangesAsync();
+        }
     }
 }

@@ -20,6 +20,7 @@ namespace Moneyboard.Core.Interfaces.Services
         Task LeaveTheProjectAsync(int projectId, string userId);
         Task EditProjectPointAsync(int projectId, ProjectPointDTO projectRoles);
         Task<double> CalculateTotalPayments(int projectId);
+        Task ProccesSalary(int projectId);
 
 
 
