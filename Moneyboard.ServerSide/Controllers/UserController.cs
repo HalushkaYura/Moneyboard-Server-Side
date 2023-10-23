@@ -55,10 +55,10 @@ namespace Moneyboard.ServerSide.Controllers
         }
         [Authorize]
         [HttpGet]
-        [Route("get-image/{userId}")]
-        public async Task<IActionResult> GetUserImage(string userId)
+        [Route("get-image/{email}")]
+        public async Task<IActionResult> GetUserImage(string email)
         {
-            var imageUrl = await _userService.GetUserImageAsync(userId);
+            var imageUrl = await _userService.GetUserImageAsync(email);
             return Ok(imageUrl);
         }
 

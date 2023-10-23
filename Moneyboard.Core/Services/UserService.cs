@@ -181,9 +181,9 @@ namespace Moneyboard.Core.Services
                 await _userRepository.SaveChangesAsync();
             }
         }
-        public async Task<string> GetUserImageAsync(string userId)
+        public async Task<string> GetUserImageAsync(string email)
         {
-            var user = _userRepository.GetByKeyAsync(userId).Result;
+            var user = _userManager.FindByEmailAsync(email).Result;
             if (user == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
 
