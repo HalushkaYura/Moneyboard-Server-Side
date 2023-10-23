@@ -18,7 +18,6 @@ namespace Moneyboard.Core.Validation
                 .MaximumLength(30);
 
             RuleFor(dto => dto.RolePoints)
-                .NotEmpty()
                 .GreaterThanOrEqualTo(0);
 
 
