@@ -398,9 +398,9 @@ namespace Moneyboard.Core.Services
             if (project == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
 
-            DateTime today = DateTime.Now;
+            /*DateTime today = DateTime.Now;
             if (today != project.SalaryDate.Date)
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Today is not a payday.");
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Today is not a payday.");*/
 
             var projectMembers = await _userProjectRepository.GetListAsync(x => x.ProjectId == projectId);
             double totalPayments = await CalculateTotalPayments(projectId);

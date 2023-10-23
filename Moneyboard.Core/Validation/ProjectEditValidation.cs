@@ -29,11 +29,8 @@ namespace Moneyboard.Core.Validation
                 .NotEmpty()
                 .NotNull();
             RuleFor(dto => dto.ProjectPoinPercent)
-                .NotEmpty()
-                .NotNull()
                 .GreaterThanOrEqualTo(0)
-                .LessThanOrEqualTo(100)
-                .NotNull();
+                .LessThanOrEqualTo(100);
         }
 
     }

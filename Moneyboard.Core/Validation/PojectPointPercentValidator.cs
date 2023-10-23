@@ -14,8 +14,6 @@ namespace Moneyboard.Core.Validation
         public PojectPointPercentValidator()
         {
             RuleFor(x => x.ProjectPoinPercent)
-                .NotEmpty()
-                .NotNull()
                 .GreaterThanOrEqualTo(0)
                 .LessThanOrEqualTo(100);
         }
