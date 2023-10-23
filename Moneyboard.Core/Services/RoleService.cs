@@ -115,12 +115,12 @@ namespace Moneyboard.Core.Services
             if (role == null || role.IsDefolt != null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "The action cannot be performed");
 
-            var userProject = await _userProjectRepository.GetEntityAsync(x => x.UserId == userId && x.RoleId == role.ProjectId);
-            if (userProject == null || userProject.IsOwner != true)
+            var userProject = await _userProjectRepository.GetEntityAsync(x => x.UserId == userId && x.ProjectId == role.ProjectId);
+            if (userProject == null )
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Not enough rights");
 
-            await AutoAssignDefaultRoleAsync(roleId, role.ProjectId);
             await _roleRepository.DeleteAsync(role);
+            await AutoAssignDefaultRoleAsync(roleId, role.ProjectId);
             await _roleRepository.SaveChangesAsync();
         }
 
