@@ -11,6 +11,9 @@ namespace Moneyboard.Core.DTO.UserDTO
         public int ProjectPoinPercent { get; set; }
         public int RolePoints { get; set; }
         public int PersonalPoints { get; set; }
+        public double BaseSalary { get; set; }
+        public double Balance { get; set; }
+
 
     }
 }

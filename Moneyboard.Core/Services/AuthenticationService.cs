@@ -311,10 +311,10 @@ namespace Moneyboard.Core.Services
         public async Task ChangePasswordAsync(UserSetNewPasswordDTO userSetPasswordDTO, string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
-
-            if (user == null)
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
-
+            var cheackPasword = await _userManager.CheckPasswordAsync(user, userSetPasswordDTO.CurrentPassword);
+            if (!cheackPasword)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Unfaithful password");
+            
             await _userManager.ChangePasswordAsync(user, userSetPasswordDTO.CurrentPassword, userSetPasswordDTO.NewPassword);
 
         }

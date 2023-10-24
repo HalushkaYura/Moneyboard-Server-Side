@@ -338,6 +338,10 @@ namespace Moneyboard.Core.Services
 
         }
 
+
+
+
+
         public async Task<double> CalculateTotalPayments(int projectId)
         {
             var project = await _projectRepository.GetByKeyAsync(projectId);
@@ -349,13 +353,21 @@ namespace Moneyboard.Core.Services
             double totalPayments = projectMembers.Count() * project.BaseSalary;
             var bankCard = await _bankCardRepository.GetByKeyAsync(project.BankCardId);
 
+
+            if (totalPayments > bankCard.Money)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Not enough funds on the bank card");
+
+
+
             List<UserCalculatorPaymentDTO> memberList = new List<UserCalculatorPaymentDTO>();
             int allPoint = 0;
+
             foreach (var member in projectMembers)
             {
                 var projectPaymentDTO = new UserCalculatorPaymentDTO();
 
                 projectPaymentDTO.ProjectPoinPercent = project.ProjectPoinPercent;
+                projectPaymentDTO.Balance = bankCard.Money - totalPayments;
                 projectPaymentDTO.PersonalPoints = member.PersonalPoints;
 
                 var role = await _roleRepository.GetByKeyAsync(member.RoleId);
@@ -367,9 +379,6 @@ namespace Moneyboard.Core.Services
             }
 
 
-            if (totalPayments > bankCard.Money)
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Not enough funds on the bank card");
-
             for (int i = 0; i < projectMembers.Count(); i++)
             {
                 double memberPayment = CalculateMemberPayment(memberList[i], (bankCard.Money - totalPayments), allPoint);
@@ -380,6 +389,7 @@ namespace Moneyboard.Core.Services
 
             return totalPayments;
         }
+
 
         private double CalculateMemberPayment(UserCalculatorPaymentDTO member, double money, int allPoint)
         {

@@ -5,7 +5,7 @@ using Moneyboard.Core.Entities.UserEntity;
 
 namespace Moneyboard.Core.Validation
 {
-    public class UserSetPasswordValidation : AbstractValidator<UserSetPasswordDTO>
+    public class UserSetPasswordValidation : AbstractValidator<UserSetNewPasswordDTO>
     {
         protected readonly UserManager<User> _userManager;
 
@@ -13,9 +13,9 @@ namespace Moneyboard.Core.Validation
         {
             _userManager = manager;
 
-            RuleFor(user => user.Password)
+            RuleFor(user => user.NewPassword)
                 .NotEmpty()
-                .MinimumLength(8)
+                .MinimumLength(6)
                 .Matches("[A-Z]")
                     .WithMessage("{PropertyName} must contain one or more capital letters.")
                 .Matches("[a-z]")
