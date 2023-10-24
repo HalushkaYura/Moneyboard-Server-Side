@@ -312,7 +312,7 @@ namespace Moneyboard.Core.Services
         {
             var user = await _userManager.FindByIdAsync(userId);
             var cheackPasword = await _userManager.CheckPasswordAsync(user, userSetPasswordDTO.CurrentPassword);
-            if (!cheackPasword)
+            if (!cheackPasword || userSetPasswordDTO.NewPassword == userSetPasswordDTO.CurrentPassword)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Unfaithful password");
             
             await _userManager.ChangePasswordAsync(user, userSetPasswordDTO.CurrentPassword, userSetPasswordDTO.NewPassword);

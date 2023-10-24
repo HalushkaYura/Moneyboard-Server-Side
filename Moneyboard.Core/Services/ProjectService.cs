@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.SignalR;
 using Moneyboard.Core.DTO.ProjectDTO;
 using Moneyboard.Core.DTO.UserDTO;
 using Moneyboard.Core.Entities.BankCardEntity;
@@ -273,7 +272,7 @@ namespace Moneyboard.Core.Services
 
             var usersDTO = _mapper.Map<List<ProjectMemberDTO>>(users);
             var rolesDTO = _mapper.Map<List<ProjectMemberDTO>>(roles);
-
+            int allPoint = await UserPointCalculator(projectId);
             for (var i = 0; i < memberDTOs.Count; i++)
             {
                 // Знаходимо відповідність між об'єктами за Id
@@ -285,7 +284,9 @@ namespace Moneyboard.Core.Services
                 memberDTOs[i].ImageUrl = userDTO.ImageUrl;
                 memberDTOs[i].RoleName = roleDTO.RoleName;
                 memberDTOs[i].RolePoints = roleDTO.RolePoints;
-                memberDTOs[i].IsDefolt = roleDTO.IsDefolt;             
+                memberDTOs[i].IsDefolt = roleDTO.IsDefolt;
+                memberDTOs[i].UserPayment = project.BaseSalary + ;
+
             }
 
 
@@ -357,8 +358,6 @@ namespace Moneyboard.Core.Services
             if (totalPayments > bankCard.Money)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Not enough funds on the bank card");
 
-
-
             List<UserCalculatorPaymentDTO> memberList = new List<UserCalculatorPaymentDTO>();
             int allPoint = 0;
 
@@ -381,13 +380,32 @@ namespace Moneyboard.Core.Services
 
             for (int i = 0; i < projectMembers.Count(); i++)
             {
-                double memberPayment = CalculateMemberPayment(memberList[i], (bankCard.Money - totalPayments), allPoint);
+                double memberPayment = CalculateMemberPayment(memberList[i], bankCard.Money-totalPayments, allPoint);
                 totalPayments += memberPayment;
             }
 
-
-
             return totalPayments;
+        }
+
+
+        private async Task<int> UserPointCalculator(int projectId)
+        {
+            var projectMembers = await _userProjectRepository.GetListAsync(x => x.ProjectId == projectId);
+            var project = await _projectRepository.GetByKeyAsync(projectId);
+            int allPoint = 0;
+
+            foreach (var member in projectMembers)
+            {
+                int projectPoinPercent = project.ProjectPoinPercent;
+                //projectPaymentDTO.Balance = bankCard.Money - totalPayments;
+                int personalPoints = member.PersonalPoints;
+
+                var role = await _roleRepository.GetByKeyAsync(member.RoleId);
+                int rolePoints = role.RolePoints;
+
+                allPoint += rolePoints + personalPoints;
+            }
+            return allPoint;
         }
 
 
