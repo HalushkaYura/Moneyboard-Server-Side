@@ -15,7 +15,7 @@ namespace Moneyboard.Core.DTO.ProjectDTO
         public DateTime CreateDate { get; set; }
         public DateTime SalaryDate { get; set; }
         public int ProjectPointPercent { get; set; }
-
+        public bool?  IsOwner { get; set; }
         public List<ProjectMemberDTO> Members { get; set; }
     }
 }

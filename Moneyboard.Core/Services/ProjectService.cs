@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using AutoMapper.Execution;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Moneyboard.Core.DTO.ProjectDTO;
 using Moneyboard.Core.DTO.UserDTO;
 using Moneyboard.Core.Entities.BankCardEntity;
@@ -15,6 +15,7 @@ using Moneyboard.Core.Interfaces.Services;
 using Moneyboard.Core.Resources;
 using System.Data;
 
+
 namespace Moneyboard.Core.Services
 {
     public class ProjectService : IProjectService
@@ -26,19 +27,18 @@ namespace Moneyboard.Core.Services
         protected readonly IHttpContextAccessor _httpContextAccessor;
         protected readonly IRoleService _roleService;
         protected readonly IRepository<UserProject> _userProjectRepository;
-        protected readonly IRepository<User> _userRepository;
         protected readonly IRepository<Role> _roleRepository;
-
+        protected readonly IRepository<User> _userRepository;
         public ProjectService(
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
             IRepository<Project> projectRepository,
             IRepository<BankCard> bankCardBaseRepository,
             IRoleService roleService,
-            IRepository<User> userRepository,
             IRepository<Role> roleRepository,
             IRepository<UserProject> userProjectRepository,
-            UserManager<User> userManager)
+            UserManager<User> userManager,
+            IRepository<User> userRepository)
         {
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
@@ -46,9 +46,9 @@ namespace Moneyboard.Core.Services
             _bankCardRepository = bankCardBaseRepository;
             _roleService = roleService;
             _userProjectRepository = userProjectRepository;
-            _userRepository = userRepository;
             _userManager = userManager;
             _roleRepository = roleRepository;
+            _userRepository = userRepository;
         }
 
 
@@ -116,7 +116,7 @@ namespace Moneyboard.Core.Services
             };
 
             await _roleRepository.AddAsync(Owner);
-            await _roleRepository.AddAsync(Member);          
+            await _roleRepository.AddAsync(Member);
             await _roleRepository.SaveChangesAsync();
             await CreateUserProject(userId, projectId, true, Owner);
         }
@@ -190,7 +190,7 @@ namespace Moneyboard.Core.Services
             projectInfo.IsOwner = isOwner;
 
             var userProjectOwer = await _userProjectRepository.GetEntityAsync(x => x.ProjectId == projectId && x.IsOwner == true);
-            var userOwner = await _userRepository.GetByKeyAsync(userProjectOwer.UserId);
+            var userOwner = await _userManager.FindByIdAsync(userProjectOwer.UserId);
             projectInfo.OwnerName = userOwner.Firstname + " " + userOwner.Lastname;
             projectInfo.OwnerURL = userOwner.ImageUrl;
             return projectInfo;
@@ -205,9 +205,9 @@ namespace Moneyboard.Core.Services
 
 
             project.Currency = projectEditDTO.Currency;
-            project.BaseSalary= projectEditDTO.BaseSalary;
-            project.Name= projectEditDTO.Name;
-            project.ProjectPoinPercent= projectEditDTO.ProjectPoinPercent;
+            project.BaseSalary = projectEditDTO.BaseSalary;
+            project.Name = projectEditDTO.Name;
+            project.ProjectPoinPercent = projectEditDTO.ProjectPoinPercent;
             project.SalaryDate = GetSalaryDate(projectEditDTO.SalaryDay);
 
 
@@ -285,11 +285,12 @@ namespace Moneyboard.Core.Services
                 memberDTOs[i].ImageUrl = userDTO.ImageUrl;
                 memberDTOs[i].RoleName = roleDTO.RoleName;
                 memberDTOs[i].RolePoints = roleDTO.RolePoints;
-                memberDTOs[i].IsDefolt = roleDTO.IsDefolt;
+                memberDTOs[i].IsDefolt = roleDTO.IsDefolt;             
             }
 
 
             projectDTO.Members = memberDTOs;
+            projectDTO.IsOwner = userProjectTest.IsOwner;
 
             return projectDTO;
         }
@@ -344,11 +345,11 @@ namespace Moneyboard.Core.Services
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
 
             var projectMembers = await _userProjectRepository.GetListAsync(x => x.ProjectId == projectId);
-            
-            double totalPayments = projectMembers.Count()*project.BaseSalary;
+
+            double totalPayments = projectMembers.Count() * project.BaseSalary;
             var bankCard = await _bankCardRepository.GetByKeyAsync(project.BankCardId);
 
-            List <UserCalculatorPaymentDTO > memberList = new List<UserCalculatorPaymentDTO>();
+            List<UserCalculatorPaymentDTO> memberList = new List<UserCalculatorPaymentDTO>();
             int allPoint = 0;
             foreach (var member in projectMembers)
             {
@@ -374,7 +375,7 @@ namespace Moneyboard.Core.Services
                 double memberPayment = CalculateMemberPayment(memberList[i], (bankCard.Money - totalPayments), allPoint);
                 totalPayments += memberPayment;
             }
-            
+
 
 
             return totalPayments;
@@ -386,12 +387,12 @@ namespace Moneyboard.Core.Services
             if (allPoint == 0)
                 return 0;
 
-            double paymentPoint = procentMoney  * member.RolePoints / allPoint + procentMoney * member.PersonalPoints / allPoint;
+            double paymentPoint = procentMoney * member.RolePoints / allPoint + procentMoney * member.PersonalPoints / allPoint;
 
             return paymentPoint;
         }
-  
-    
+
+
         public async Task ProccesSalary(int projectId)
         {
             var project = await _projectRepository.GetByKeyAsync(projectId);
@@ -406,8 +407,11 @@ namespace Moneyboard.Core.Services
             double totalPayments = await CalculateTotalPayments(projectId);
             var bankCard = await _bankCardRepository.GetByKeyAsync(project.BankCardId);
 
+
+
             if (totalPayments > bankCard.Money)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Not enough funds on the bank card");
+
 
             bankCard.Money -= totalPayments;
             project.SalaryDate = project.SalaryDate.AddMonths(1);
@@ -417,5 +421,7 @@ namespace Moneyboard.Core.Services
             await _bankCardRepository.UpdateAsync(bankCard);
             await _bankCardRepository.SaveChangesAsync();
         }
+
+
     }
 }

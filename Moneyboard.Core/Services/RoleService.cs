@@ -21,14 +21,12 @@ namespace Moneyboard.Core.Services
         protected readonly IHttpContextAccessor _httpContextAccessor;
         protected readonly UserManager<User> _userManager;
         protected readonly IRepository<UserProject> _userProjectRepository;
-        private readonly IRepository<User> _userRepository;
 
         public RoleService(
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
             IRepository<Project> projectRepository,
             IRepository<Role> roleRepository,
-            IRepository<User> userRepository,
             UserManager<User> userManager,
             IRepository<UserProject> userProjectRepository)
         {
@@ -38,7 +36,6 @@ namespace Moneyboard.Core.Services
             _roleRepository = roleRepository;
             _userManager = userManager;
             _userProjectRepository = userProjectRepository;
-            _userRepository = userRepository;
         }
         public async Task CreateNewRoleAsync(int projectId)
         {
@@ -82,7 +79,7 @@ namespace Moneyboard.Core.Services
 
         public async Task AssignRoleToProjectMemberAsync(RoleAssignmentRoleDTO roleAssignmentRoleDTO)
         {
-            var user = await _userRepository.GetByKeyAsync(roleAssignmentRoleDTO.UserId);
+            var user = await _userManager.FindByIdAsync(roleAssignmentRoleDTO.UserId);
             if (user == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
 

@@ -19,7 +19,6 @@ namespace Moneyboard.Core.Services
     public class UserService : IUserService
     {
         protected readonly UserManager<User> _userManager;
-        protected readonly IRepository<User> _userRepository;
         protected readonly IEmailSenderService _emailSenderService;
         protected readonly IMapper _mapper;
         private readonly IFileService _fileService;
@@ -31,7 +30,6 @@ namespace Moneyboard.Core.Services
 
 
         public UserService(UserManager<User> userManager,
-            IRepository<User> userRepository,
             IMapper mapper,
             IEmailSenderService emailSenderService,
             IFileService fileService,
@@ -42,7 +40,6 @@ namespace Moneyboard.Core.Services
             IWebHostEnvironment webHostEnvironment)
         {
             _userManager = userManager;
-            _userRepository = userRepository;
             //_inviteUserRepository = inviteUser;
             _mapper = mapper;
             _fileService = fileService;
@@ -56,7 +53,7 @@ namespace Moneyboard.Core.Services
 
         public async Task<UserChangeInfoDTO> UserInfoAsync(string userId)
         {
-            var user = await _userRepository.GetByKeyAsync(userId);
+            var user = await _userManager.FindByIdAsync(userId);
             var userPersonalInfo = _mapper.Map<UserChangeInfoDTO>(user);
 
             return userPersonalInfo;
@@ -163,7 +160,7 @@ namespace Moneyboard.Core.Services
 
         public async Task UploadAvatar(UserImageUploadDTO imageDTO, string userId)
         {
-            var user = await _userRepository.GetByKeyAsync(userId);
+            var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
 
@@ -177,8 +174,7 @@ namespace Moneyboard.Core.Services
                     await imageDTO.Image.CopyToAsync(fileStream);
                 }
                 user.ImageUrl = uniqueFileName;
-                await _userRepository.UpdateAsync(user);
-                await _userRepository.SaveChangesAsync();
+                await _userManager.UpdateAsync(user);
             }
         }
         public async Task<string> GetUserImageAsync(string email)
@@ -198,38 +194,5 @@ namespace Moneyboard.Core.Services
         }
 
 
-
-        /*        public async Task UploadAvatar(UserImageUploadDTO imageDTO, string userId)
-        {
-            var user = await _userRepository.GetByKeyAsync(userId);
-            if (user == null)
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
-
-            if (imageDTO.Image != null)
-            {
-                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/users");
-                var uniqueFileName = Guid.NewGuid().ToString() + "_" + imageDTO.Image.FileName;
-                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    await imageDTO.Image.CopyToAsync(fileStream);
-                }
-                user.ImageUrl = uniqueFileName;
-                await _userRepository.UpdateAsync(user);
-                await _userRepository.SaveChangesAsync();
-            }
-        }
-        public async Task<byte[]> GetUserImageAsync(string userId)
-        {
-            var user = await _userRepository.GetByKeyAsync(userId);
-            if (user == null)
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
-
-            var imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "images/users", user.ImageUrl);
-            if (!System.IO.File.Exists(imagePath))
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.FileNotFound);
-
-            return System.IO.File.ReadAllBytes(imagePath);
-        }*/
     }
 }

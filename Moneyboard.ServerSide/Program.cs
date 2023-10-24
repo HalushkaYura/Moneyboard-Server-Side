@@ -1,10 +1,7 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Moneyboard.Core;
-using Moneyboard.Core.Entities.UserEntity;
 using Moneyboard.Core.Helpers;
 using Moneyboard.Infrastructure;
-using Moneyboard.Infrastructure.Data;
 using Moneyboard.WebApi.Middleweres;
 using Moneyboard.WebApi.ServiceExtension;
 using Newtonsoft.Json.Serialization;
@@ -36,7 +33,6 @@ namespace Moneyboard.ServerSide
             services.AddRepositories();
             services.AddCustomServices();
             services.AddFluentValitation();
-            services.AddAuthentication();
             services.AddSwagger();
             services.ConfigureImageSettings(configuration);
             services.AddAutoMapper();
@@ -71,7 +67,6 @@ namespace Moneyboard.ServerSide
 
             //ADDED
             app.UseCors(x => x.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod());
-            app.UseCors("AllowReactApp");
             //
 
             // Configure the HTTP request pipeline.
@@ -80,7 +75,9 @@ namespace Moneyboard.ServerSide
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            //
 
+            //
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
