@@ -267,12 +267,13 @@ namespace Moneyboard.Core.Services
             var roles = await _roleRepository.GetListAsync(x => x.ProjectId == projectId);
             var users = await _userRepository.GetListAsync(x => userProjectUserIds.Contains(x.Id));
 
-
             var memberDTOs = _mapper.Map<List<ProjectMemberDTO>>(userProjects);
-
             var usersDTO = _mapper.Map<List<ProjectMemberDTO>>(users);
             var rolesDTO = _mapper.Map<List<ProjectMemberDTO>>(roles);
             int allPoint = await UserPointCalculator(projectId);
+            var bankCard = await _bankCardRepository.GetByKeyAsync(project.BankCardId);
+            double basePay = (bankCard.Money - project.BaseSalary * userProjects.Count()) * project.ProjectPoinPercent / 100;
+
             for (var i = 0; i < memberDTOs.Count; i++)
             {
                 // Знаходимо відповідність між об'єктами за Id
@@ -285,10 +286,10 @@ namespace Moneyboard.Core.Services
                 memberDTOs[i].RoleName = roleDTO.RoleName;
                 memberDTOs[i].RolePoints = roleDTO.RolePoints;
                 memberDTOs[i].IsDefolt = roleDTO.IsDefolt;
-                memberDTOs[i].UserPayment = project.BaseSalary + ;
-
+                memberDTOs[i].UserPayment = basePay > 0 ? basePay * roleDTO.RolePoints / allPoint + basePay * memberDTOs[i].PersonalPoints / allPoint + project.BaseSalary : null;
+                memberDTOs[i].RolePayment = basePay > 0 ? basePay * roleDTO.RolePoints / allPoint : 0;
+                memberDTOs[i].PersonelPayment = basePay > 0 ? basePay * memberDTOs[i].PersonalPoints / allPoint : 0;
             }
-
 
             projectDTO.Members = memberDTOs;
             projectDTO.IsOwner = userProjectTest.IsOwner;
@@ -380,7 +381,7 @@ namespace Moneyboard.Core.Services
 
             for (int i = 0; i < projectMembers.Count(); i++)
             {
-                double memberPayment = CalculateMemberPayment(memberList[i], bankCard.Money-totalPayments, allPoint);
+                double memberPayment = CalculateMemberPayment(memberList[i], bankCard.Money - totalPayments, allPoint);
                 totalPayments += memberPayment;
             }
 
@@ -411,9 +412,10 @@ namespace Moneyboard.Core.Services
 
         private double CalculateMemberPayment(UserCalculatorPaymentDTO member, double money, int allPoint)
         {
-            double procentMoney = member.ProjectPoinPercent * money / 100;
-            if (allPoint == 0)
+            if (allPoint == 0 || money <= 0)
                 return 0;
+            double procentMoney = member.ProjectPoinPercent * money / 100;
+
 
             double paymentPoint = procentMoney * member.RolePoints / allPoint + procentMoney * member.PersonalPoints / allPoint;
 
@@ -450,6 +452,16 @@ namespace Moneyboard.Core.Services
             await _bankCardRepository.SaveChangesAsync();
         }
 
+        public async Task EditPersonalPoint(PersonalPointDTO personalPointDTO, int projectId, string userId)
+        {
+            var userProject = await _userProjectRepository.GetEntityAsync(x => x.ProjectId == projectId && x.UserId == userId);
+            if (userProject == null)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.AttachmentNotFound);
 
+            userProject.PersonalPoints = personalPointDTO.PersonalPoint;
+
+            await _userProjectRepository.UpdateAsync(userProject);
+            await _userProjectRepository.SaveChangesAsync();
+        }
     }
 }

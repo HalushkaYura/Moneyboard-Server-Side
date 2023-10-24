@@ -159,5 +159,14 @@ namespace Moneyboard.ServerSide.Controllers
             await _projectService.ProccesSalary(projectId);
             return Ok("Salary processed successfully.");
         }
+
+        [Authorize]
+        [HttpPut]
+        [Route("personal-point/{projectId}/{userId}")]
+        public async Task<IActionResult> UpdatePersonalPoint([FromBody] PersonalPointDTO personalPointDTO, int projectId, string userId)
+        {
+            await _projectService.EditPersonalPoint(personalPointDTO, projectId, userId);
+            return Ok();
+        }
     }
 }

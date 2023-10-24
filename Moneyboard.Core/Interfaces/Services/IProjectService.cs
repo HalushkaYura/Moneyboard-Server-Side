@@ -22,6 +22,8 @@ namespace Moneyboard.Core.Interfaces.Services
         Task<double> CalculateTotalPayments(int projectId);
         Task ProccesSalary(int projectId);
 
+        Task EditPersonalPoint(PersonalPointDTO personalPointDTO, int projectId, string userId);
+
 
 
         //Task<(IEnumerable<ProjectForUserDTO> Owners, IEnumerable<ProjectForUserDTO> Members)> GetAllProjectsForUserAsync(string userId);
