@@ -11,6 +11,6 @@ namespace Moneyboard.Core.DTO.BankCardDTO
         public string CardNumber { get; set; }
         public string CardVerificationValue { get; set; }
         public DateTime ExpirationDate { get; set; }
-
+        public double Money { get; set; }
     }
 }

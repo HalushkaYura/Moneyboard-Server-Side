@@ -1,7 +1,9 @@
 using Hangfire;
+using Microsoft.AspNet.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Moneyboard.Core;
 using Moneyboard.Core.Helpers;
+using Moneyboard.Core.SignalRChat;
 using Moneyboard.Infrastructure;
 using Moneyboard.WebApi.Middleweres;
 using Moneyboard.WebApi.ServiceExtension;
@@ -73,7 +75,6 @@ namespace Moneyboard.ServerSide
             //ADDED
             app.UseCors(x => x.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod());
             //
-
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -81,6 +82,7 @@ namespace Moneyboard.ServerSide
                 app.UseSwaggerUI();
             }
             //
+            //app.MapHub<SignalRHub>("/notificationHub");
 
             //
             app.UseHttpsRedirection();

@@ -53,7 +53,7 @@ namespace Moneyboard.Core.Services
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.AttachmentNotFound);
 
             _mapper.Map(banckCardEditDTO, bankCard);
-            bankCard.Money = project.BaseSalary * 2;
+
 
             await _bankCardBaseRepository.UpdateAsync(bankCard);
             await _bankCardBaseRepository.SaveChangesAsync();

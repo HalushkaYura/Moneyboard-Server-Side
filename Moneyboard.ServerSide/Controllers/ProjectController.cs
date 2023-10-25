@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Moneyboard.Core.DTO.BankCardDTO;
 using Moneyboard.Core.DTO.ProjectDTO;
+using Moneyboard.Core.Entities.UserEntity;
 using Moneyboard.Core.Interfaces.Services;
 using Moneyboard.Core.Services;
 using System.Security.Claims;
@@ -17,6 +18,7 @@ namespace Moneyboard.ServerSide.Controllers
         private readonly IRoleService _roleService;
         private readonly IBackgroundJobClient _backgroundJobClient;
         private readonly IBankCardService _bankCardService;
+
         private string UserId => User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
         public ProjectController(
@@ -90,7 +92,7 @@ namespace Moneyboard.ServerSide.Controllers
         {
 
             await _projectService.EditProjectDateAsync(projectEditDTO, projectId, UserId);
-            return Ok("Проект успішно оновлено");
+            return Ok("The project has been successfully updated");
         }
 
         [Authorize]
@@ -100,7 +102,7 @@ namespace Moneyboard.ServerSide.Controllers
         {
 
             await _bankCardService.EditBankCardDateAsync(bankCardEditDTO, projectId, UserId);
-            return Ok("Проект успішно оновлено");
+            return Ok("The bankcard has been successfully updated");
         }
 
         [Authorize]

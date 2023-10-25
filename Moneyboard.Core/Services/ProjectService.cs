@@ -28,6 +28,7 @@ namespace Moneyboard.Core.Services
         protected readonly IRepository<UserProject> _userProjectRepository;
         protected readonly IRepository<Role> _roleRepository;
         protected readonly IRepository<User> _userRepository;
+        protected readonly INotificationService _notificationService;
         public ProjectService(
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
@@ -37,7 +38,8 @@ namespace Moneyboard.Core.Services
             IRepository<Role> roleRepository,
             IRepository<UserProject> userProjectRepository,
             UserManager<User> userManager,
-            IRepository<User> userRepository)
+            IRepository<User> userRepository,
+            INotificationService notificationService)
         {
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
@@ -48,6 +50,7 @@ namespace Moneyboard.Core.Services
             _userManager = userManager;
             _roleRepository = roleRepository;
             _userRepository = userRepository;
+            _notificationService = notificationService;
         }
 
 
@@ -147,10 +150,16 @@ namespace Moneyboard.Core.Services
             if (role == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Role not found.");
 
+
             await CreateUserProject(userId, projectId, false, role);
 
         }
 
+        private async Task Notification(string userId, string message)
+        {
+            await _notificationService.SendNotificationToUser(userId, message);
+
+        }
         private async Task CreateUserProject(string userId, int projectId, bool isOwner, Role role)
         {
             var project = await _projectRepository.GetByKeyAsync(projectId);
@@ -209,6 +218,11 @@ namespace Moneyboard.Core.Services
             project.ProjectPoinPercent = projectEditDTO.ProjectPoinPercent;
             project.SalaryDate = GetSalaryDate(projectEditDTO.SalaryDay);
 
+            var userProject = await _userProjectRepository.GetListAsync(x => x.ProjectId == projectId);
+            foreach (var users in userProject)
+            {
+                await Notification(users.UserId, "Project data has been changed ");
+            }
 
             await _projectRepository.UpdateAsync(project);
             await _projectRepository.SaveChangesAsync();
@@ -221,6 +235,12 @@ namespace Moneyboard.Core.Services
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
 
             project.ProjectPoinPercent = projectPointProcent.ProjectPoinPercent;
+
+            var userProject = await _userProjectRepository.GetListAsync(x => x.ProjectId == projectId);
+            foreach (var users in userProject)
+            {
+                await Notification(users.UserId, "Project data has been changed");
+            }
 
             await _projectRepository.UpdateAsync(project);
             await _projectRepository.SaveChangesAsync();
@@ -306,6 +326,9 @@ namespace Moneyboard.Core.Services
             if (userProject == null || userProject.IsOwner != true)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Not enough rights");
 
+
+
+
             await _projectRepository.DeleteAsync(project);
             await _projectRepository.SaveChangesAsync();
         }
@@ -334,6 +357,8 @@ namespace Moneyboard.Core.Services
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
 
             project.ProjectPoinPercent = projectPointDTO.ProjectPoinPercent;
+            var userProject = await _userProjectRepository.GetListAsync(x => x.ProjectId == projectId);
+
 
             await _projectRepository.UpdateAsync(project);
             await _projectRepository.SaveChangesAsync();
@@ -347,6 +372,9 @@ namespace Moneyboard.Core.Services
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.AttachmentNotFound);
 
             userProject.PersonalPoints = personalPointDTO.PersonalPoint;
+
+
+
 
             await _userProjectRepository.UpdateAsync(userProject);
             await _userProjectRepository.SaveChangesAsync();
@@ -366,7 +394,7 @@ namespace Moneyboard.Core.Services
             List<UserCalculatorPaymentDTO> memberList = new List<UserCalculatorPaymentDTO>();
             int allPoint = 0;
 
-            if(totalPayments>bankCard.Money)
+            if (totalPayments > bankCard.Money)
             {
                 foreach (var member in projectMembers)
                 {
@@ -397,7 +425,7 @@ namespace Moneyboard.Core.Services
             {
                 TotalPayment = totalPayments,
                 BankCardMoney = bankCard.Money,
-                IsEnough = totalPayments > bankCard.Money 
+                IsEnough = totalPayments > bankCard.Money
             };
 
 
@@ -458,6 +486,7 @@ namespace Moneyboard.Core.Services
             bankCard.Money -= totalPayments.TotalPayment;
             project.SalaryDate = project.SalaryDate.AddMonths(1);
 
+
             await _projectRepository.UpdateAsync(project);
             await _projectRepository.SaveChangesAsync();
             await _bankCardRepository.UpdateAsync(bankCard);
@@ -466,10 +495,18 @@ namespace Moneyboard.Core.Services
 
         public async Task DeleteUserWithProject(string userId, int projectId, string userActive)
         {
-            var userProject = await _userProjectRepository.GetEntityAsync(x=>x.UserId==userActive && x.ProjectId == projectId);
-            if(userProject.IsOwner !=null)
+            var userProject = await _userProjectRepository.GetEntityAsync(x => x.UserId == userActive && x.ProjectId == projectId);
+            if (userProject.IsOwner != null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Not enough rights");
             var userProjectDelete = await _userProjectRepository.GetEntityAsync(x => x.UserId == userId && x.ProjectId == projectId);
+
+            var userProjects = await _userProjectRepository.GetListAsync(x => x.ProjectId == projectId);
+            foreach (var users in userProjects)
+            {
+                await Notification(users.UserId, "Project data has been changed");
+            }
+
+
             await _userProjectRepository.DeleteAsync(userProjectDelete);
             await _userProjectRepository.SaveChangesAsync();
         }

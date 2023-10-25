@@ -27,6 +27,7 @@ namespace Moneyboard.Core
             services.AddScoped<IProjectService, ProjectService>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IBankCardService, BanckCardService>();
+            services.AddScoped<INotificationService, NotificationService>();
             services.AddSignalR();
 
 
