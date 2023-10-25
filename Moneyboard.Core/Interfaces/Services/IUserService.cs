@@ -24,5 +24,6 @@ namespace Moneyboard.Core.Interfaces.Services
         //----------------------------------------------------------
         Task UploadAvatar(UserImageUploadDTO imageDTO, string userId);
         Task<string> GetUserImageAsync(string userId);
+        Task DeleteUserAccount(string userId);
     }
 }

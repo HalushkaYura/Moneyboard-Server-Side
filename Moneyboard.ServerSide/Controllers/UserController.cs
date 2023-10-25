@@ -62,5 +62,15 @@ namespace Moneyboard.ServerSide.Controllers
             return Ok(imageUrl);
         }
 
+        [Authorize]
+        [HttpDelete]
+        [Route("delete")]
+        public async Task<IActionResult> DeleteUserAccount()
+        {
+            await _userService.DeleteUserAccount(UserId);
+
+            return Ok();
+        }
+
     }
 }

@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Moneyboard.Core.ApiModels;
 using Moneyboard.Core.DTO.UserDTO;
+using Moneyboard.Core.Entities.RoleEntity;
 using Moneyboard.Core.Entities.UserEntity;
+using Moneyboard.Core.Entities.UserProjectEntity;
 using Moneyboard.Core.Exeptions;
 using Moneyboard.Core.Helpers;
 using Moneyboard.Core.Helpers.Mails;
@@ -19,6 +21,7 @@ namespace Moneyboard.Core.Services
     public class UserService : IUserService
     {
         protected readonly UserManager<User> _userManager;
+        protected readonly IRepository<UserProject> _userProjectRepository;
         protected readonly IEmailSenderService _emailSenderService;
         protected readonly IMapper _mapper;
         private readonly IFileService _fileService;
@@ -37,7 +40,8 @@ namespace Moneyboard.Core.Services
             ITemplateService templateService,
             IOptions<ClientUrl> clientUrl,
             IHttpContextAccessor httpContextAccessor,
-            IWebHostEnvironment webHostEnvironment)
+            IWebHostEnvironment webHostEnvironment,
+            IRepository<UserProject> userProjectRepository)
         {
             _userManager = userManager;
             //_inviteUserRepository = inviteUser;
@@ -49,6 +53,7 @@ namespace Moneyboard.Core.Services
             _clientUrl = clientUrl;
             _httpContextAccessor = httpContextAccessor;
             _webHostEnvironment = webHostEnvironment;
+            _userProjectRepository = userProjectRepository;
         }
 
         public async Task<UserChangeInfoDTO> UserInfoAsync(string userId)
@@ -193,6 +198,17 @@ namespace Moneyboard.Core.Services
             return imageUrl;
         }
 
+
+        public async Task DeleteUserAccount(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if(user == null)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
+            var userList = await _userProjectRepository.GetListAsync(x => x.UserId == userId);
+            if ( !userList.Any())
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "In order to delete the account, you need to exit all projects");
+            await _userManager.DeleteAsync(user);
+        }
 
     }
 }
