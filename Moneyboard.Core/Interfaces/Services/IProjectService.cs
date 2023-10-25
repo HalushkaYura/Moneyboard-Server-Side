@@ -19,9 +19,9 @@ namespace Moneyboard.Core.Interfaces.Services
         Task DeleteProjectAsync(int projectId, string userId);
         Task LeaveTheProjectAsync(int projectId, string userId);
         Task EditProjectPointAsync(int projectId, ProjectPointDTO projectRoles);
-        Task<double> CalculateTotalPayments(int projectId);
+        Task<ProjectCalculationDTO> CalculateTotalPayments(int projectId);
         Task ProccesSalary(int projectId);
-
+        Task DeleteUserWithProject(string userId, int projectId, string userActive);
         Task EditPersonalPoint(PersonalPointDTO personalPointDTO, int projectId, string userId);
 
 

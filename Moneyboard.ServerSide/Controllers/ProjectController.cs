@@ -165,14 +165,24 @@ namespace Moneyboard.ServerSide.Controllers
             return Ok(totalPayments);
         }
 
-            [Authorize]
-            [HttpPost]
-            [Route("process-salary/{projectId}")]
-            public IActionResult ScheduleProcessSalary(int projectId)
-            {
+        [Authorize]
+        [HttpPost]
+        [Route("process-salary/{projectId}")]
+        public IActionResult ScheduleProcessSalary(int projectId)
+        {
             RecurringJob.AddOrUpdate($"ProccesSalary_Project_{projectId}", () => _projectService.ProccesSalary(projectId), Cron.Daily(10));
             return Ok("Processing salary scheduled.");
-            }
+        }
+
+        [Authorize]
+        [HttpDelete]
+        [Route("kicked/{userId}/{projectId}")]
+        public async Task<IActionResult> DeleteUserAccount(string userId, int projectId)
+        {
+            await _projectService.DeleteUserWithProject(userId, projectId, UserId);
+
+            return Ok();
+        }
 
 
     }

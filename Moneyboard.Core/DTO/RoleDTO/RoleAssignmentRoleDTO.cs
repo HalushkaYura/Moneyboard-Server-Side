@@ -10,6 +10,5 @@ namespace Moneyboard.Core.DTO.RoleDTO
     {
         public string UserId { get; set; }
         public int RoleId { get; set; }
-        public int ProjectId { get; set; }
     }
 }

@@ -286,9 +286,9 @@ namespace Moneyboard.Core.Services
                 memberDTOs[i].RoleName = roleDTO.RoleName;
                 memberDTOs[i].RolePoints = roleDTO.RolePoints;
                 memberDTOs[i].IsDefolt = roleDTO.IsDefolt;
-                memberDTOs[i].UserPayment = basePay > 0 ? basePay * roleDTO.RolePoints / allPoint + basePay * memberDTOs[i].PersonalPoints / allPoint + project.BaseSalary : null;
                 memberDTOs[i].RolePayment = basePay > 0 ? basePay * roleDTO.RolePoints / allPoint : 0;
                 memberDTOs[i].PersonelPayment = basePay > 0 ? basePay * memberDTOs[i].PersonalPoints / allPoint : 0;
+                memberDTOs[i].UserPayment = project.BaseSalary + memberDTOs[i].PersonelPayment + memberDTOs[i].RolePayment;
             }
 
             projectDTO.Members = memberDTOs;
@@ -351,7 +351,7 @@ namespace Moneyboard.Core.Services
             await _userProjectRepository.UpdateAsync(userProject);
             await _userProjectRepository.SaveChangesAsync();
         }
-        public async Task<double> CalculateTotalPayments(int projectId)
+        public async Task<ProjectCalculationDTO> CalculateTotalPayments(int projectId)
         {
             var project = await _projectRepository.GetByKeyAsync(projectId);
             if (project == null)
@@ -366,30 +366,42 @@ namespace Moneyboard.Core.Services
             List<UserCalculatorPaymentDTO> memberList = new List<UserCalculatorPaymentDTO>();
             int allPoint = 0;
 
-            foreach (var member in projectMembers)
+            if(totalPayments>bankCard.Money)
             {
-                var projectPaymentDTO = new UserCalculatorPaymentDTO();
+                foreach (var member in projectMembers)
+                {
+                    var projectPaymentDTO = new UserCalculatorPaymentDTO();
 
-                projectPaymentDTO.ProjectPoinPercent = project.ProjectPoinPercent;
-                projectPaymentDTO.Balance = bankCard.Money - totalPayments;
-                projectPaymentDTO.PersonalPoints = member.PersonalPoints;
+                    projectPaymentDTO.ProjectPoinPercent = project.ProjectPoinPercent;
+                    projectPaymentDTO.Balance = bankCard.Money - totalPayments;
+                    projectPaymentDTO.PersonalPoints = member.PersonalPoints;
 
-                var role = await _roleRepository.GetByKeyAsync(member.RoleId);
-                projectPaymentDTO.RolePoints = role.RolePoints;
+                    var role = await _roleRepository.GetByKeyAsync(member.RoleId);
+                    projectPaymentDTO.RolePoints = role.RolePoints;
 
-                memberList.Add(projectPaymentDTO);
+                    memberList.Add(projectPaymentDTO);
 
-                allPoint += projectPaymentDTO.RolePoints + projectPaymentDTO.PersonalPoints;
+                    allPoint += projectPaymentDTO.RolePoints + projectPaymentDTO.PersonalPoints;
+                }
+
+
+                for (int i = 0; i < projectMembers.Count(); i++)
+                {
+                    double memberPayment = CalculateMemberPayment(memberList[i], bankCard.Money - totalPayments, allPoint);
+                    totalPayments += memberPayment;
+                }
             }
 
 
-            for (int i = 0; i < projectMembers.Count(); i++)
+            ProjectCalculationDTO projectCalculationDTO = new ProjectCalculationDTO()
             {
-                double memberPayment = CalculateMemberPayment(memberList[i], bankCard.Money - totalPayments, allPoint);
-                totalPayments += memberPayment;
-            }
+                TotalPayment = totalPayments,
+                BankCardMoney = bankCard.Money,
+                IsEnough = totalPayments > bankCard.Money 
+            };
 
-            return totalPayments;
+
+            return projectCalculationDTO;
         }
 
 
@@ -437,13 +449,13 @@ namespace Moneyboard.Core.Services
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Today is not a payday.");
 
             var projectMembers = await _userProjectRepository.GetListAsync(x => x.ProjectId == projectId);
-            double totalPayments = await CalculateTotalPayments(projectId);
+            var totalPayments = await CalculateTotalPayments(projectId);
             var bankCard = await _bankCardRepository.GetByKeyAsync(project.BankCardId);
 
-            if (totalPayments > bankCard.Money)
+            if (totalPayments.TotalPayment > bankCard.Money)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Not enough funds on the bank card");
 
-            bankCard.Money -= totalPayments;
+            bankCard.Money -= totalPayments.TotalPayment;
             project.SalaryDate = project.SalaryDate.AddMonths(1);
 
             await _projectRepository.UpdateAsync(project);
@@ -452,7 +464,15 @@ namespace Moneyboard.Core.Services
             await _bankCardRepository.SaveChangesAsync();
         }
 
-
+        public async Task DeleteUserWithProject(string userId, int projectId, string userActive)
+        {
+            var userProject = await _userProjectRepository.GetEntityAsync(x=>x.UserId==userActive && x.ProjectId == projectId);
+            if(userProject.IsOwner !=null)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Not enough rights");
+            var userProjectDelete = await _userProjectRepository.GetEntityAsync(x => x.UserId == userId && x.ProjectId == projectId);
+            await _userProjectRepository.DeleteAsync(userProjectDelete);
+            await _userProjectRepository.SaveChangesAsync();
+        }
 
     }
 }

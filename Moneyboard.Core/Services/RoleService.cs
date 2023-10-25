@@ -77,13 +77,13 @@ namespace Moneyboard.Core.Services
             await _roleRepository.SaveChangesAsync();
         }
 
-        public async Task AssignRoleToProjectMemberAsync(RoleAssignmentRoleDTO roleAssignmentRoleDTO)
+        public async Task AssignRoleToProjectMemberAsync(RoleAssignmentRoleDTO roleAssignmentRoleDTO, int projectId)
         {
             var user = await _userManager.FindByIdAsync(roleAssignmentRoleDTO.UserId);
             if (user == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
 
-            var userProject = await _userProjectRepository.GetEntityAsync(x => x.UserId == roleAssignmentRoleDTO.UserId && x.ProjectId == roleAssignmentRoleDTO.ProjectId);
+            var userProject = await _userProjectRepository.GetEntityAsync(x => x.UserId == roleAssignmentRoleDTO.UserId && x.ProjectId == projectId);
             if (userProject == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotMember);
 
