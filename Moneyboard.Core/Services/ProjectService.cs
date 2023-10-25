@@ -340,10 +340,17 @@ namespace Moneyboard.Core.Services
 
         }
 
+        public async Task EditPersonalPoint(PersonalPointDTO personalPointDTO, int projectId, string userId)
+        {
+            var userProject = await _userProjectRepository.GetEntityAsync(x => x.ProjectId == projectId && x.UserId == userId);
+            if (userProject == null)
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.AttachmentNotFound);
 
+            userProject.PersonalPoints = personalPointDTO.PersonalPoint;
 
-
-
+            await _userProjectRepository.UpdateAsync(userProject);
+            await _userProjectRepository.SaveChangesAsync();
+        }
         public async Task<double> CalculateTotalPayments(int projectId)
         {
             var project = await _projectRepository.GetByKeyAsync(projectId);
@@ -398,7 +405,6 @@ namespace Moneyboard.Core.Services
             foreach (var member in projectMembers)
             {
                 int projectPoinPercent = project.ProjectPoinPercent;
-                //projectPaymentDTO.Balance = bankCard.Money - totalPayments;
                 int personalPoints = member.PersonalPoints;
 
                 var role = await _roleRepository.GetByKeyAsync(member.RoleId);
@@ -429,19 +435,16 @@ namespace Moneyboard.Core.Services
             if (project == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
 
-            /*DateTime today = DateTime.Now;
+            DateTime today = DateTime.Now;
             if (today != project.SalaryDate.Date)
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Today is not a payday.");*/
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Today is not a payday.");
 
             var projectMembers = await _userProjectRepository.GetListAsync(x => x.ProjectId == projectId);
             double totalPayments = await CalculateTotalPayments(projectId);
             var bankCard = await _bankCardRepository.GetByKeyAsync(project.BankCardId);
 
-
-
             if (totalPayments > bankCard.Money)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Not enough funds on the bank card");
-
 
             bankCard.Money -= totalPayments;
             project.SalaryDate = project.SalaryDate.AddMonths(1);
@@ -452,16 +455,7 @@ namespace Moneyboard.Core.Services
             await _bankCardRepository.SaveChangesAsync();
         }
 
-        public async Task EditPersonalPoint(PersonalPointDTO personalPointDTO, int projectId, string userId)
-        {
-            var userProject = await _userProjectRepository.GetEntityAsync(x => x.ProjectId == projectId && x.UserId == userId);
-            if (userProject == null)
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.AttachmentNotFound);
 
-            userProject.PersonalPoints = personalPointDTO.PersonalPoint;
 
-            await _userProjectRepository.UpdateAsync(userProject);
-            await _userProjectRepository.SaveChangesAsync();
-        }
     }
 }

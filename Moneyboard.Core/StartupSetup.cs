@@ -29,6 +29,8 @@ namespace Moneyboard.Core
             services.AddScoped<IBankCardService, BanckCardService>();
             services.AddSignalR();
 
+
+
         }
 
         /*public static void AddFileService(this IServiceCollection services, IConfiguration configuration)

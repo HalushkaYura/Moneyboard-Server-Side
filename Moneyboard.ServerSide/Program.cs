@@ -1,3 +1,4 @@
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Moneyboard.Core;
 using Moneyboard.Core.Helpers;
@@ -39,6 +40,8 @@ namespace Moneyboard.ServerSide
             services.AddJwtAuthentication(configuration);
             services.AddMvcCore().AddRazorViewEngine();
 
+            services.AddHangfire(x => x.UseSqlServerStorage(configuration.GetConnectionString("DefaultConnection")));
+            services.AddHangfireServer();
         }
         public static void Main(string[] args)
         {
@@ -62,6 +65,8 @@ namespace Moneyboard.ServerSide
             //
 
             var app = builder.Build();
+            app.UseHangfireServer();
+            app.UseHangfireDashboard();
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 

@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Hangfire;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Moneyboard.Core.DTO.BankCardDTO;
 using Moneyboard.Core.DTO.ProjectDTO;
 using Moneyboard.Core.Interfaces.Services;
+using Moneyboard.Core.Services;
 using System.Security.Claims;
 
 namespace Moneyboard.ServerSide.Controllers
@@ -13,17 +15,21 @@ namespace Moneyboard.ServerSide.Controllers
     {
         private readonly Core.Interfaces.Services.IProjectService _projectService;
         private readonly IRoleService _roleService;
+        private readonly IBackgroundJobClient _backgroundJobClient;
         private readonly IBankCardService _bankCardService;
         private string UserId => User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
         public ProjectController(
             Core.Interfaces.Services.IProjectService projectService,
             IRoleService roleService,
-            IBankCardService bankCardService)
+            IBankCardService bankCardService,
+            IBackgroundJobClient backgroundJobClient)
         {
             _projectService = projectService;
             _roleService = roleService;
             _bankCardService = bankCardService;
+            _backgroundJobClient = backgroundJobClient;
+            _backgroundJobClient = backgroundJobClient;
         }
 
         [Authorize]
@@ -115,6 +121,14 @@ namespace Moneyboard.ServerSide.Controllers
             return Ok();
         }
         [Authorize]
+        [HttpPut]
+        [Route("personal-point/{projectId}/{userId}")]
+        public async Task<IActionResult> UpdatePersonalPoint([FromBody] PersonalPointDTO personalPointDTO, int projectId, string userId)
+        {
+            await _projectService.EditPersonalPoint(personalPointDTO, projectId, userId);
+            return Ok();
+        }
+        [Authorize]
         [HttpGet]
         [Route("details/{projectId}")]
         public async Task<IActionResult> ProjectTableInfo(int projectId)
@@ -151,22 +165,15 @@ namespace Moneyboard.ServerSide.Controllers
             return Ok(totalPayments);
         }
 
-        [Authorize]
-        [HttpPost]
-        [Route("process-salary/{projectId}")]
-        public async Task<IActionResult> ProcessSalary(int projectId)
-        {
-            await _projectService.ProccesSalary(projectId);
-            return Ok("Salary processed successfully.");
-        }
+            [Authorize]
+            [HttpPost]
+            [Route("process-salary/{projectId}")]
+            public IActionResult ScheduleProcessSalary(int projectId)
+            {
+            RecurringJob.AddOrUpdate($"ProccesSalary_Project_{projectId}", () => _projectService.ProccesSalary(projectId), Cron.Daily(10));
+            return Ok("Processing salary scheduled.");
+            }
 
-        [Authorize]
-        [HttpPut]
-        [Route("personal-point/{projectId}/{userId}")]
-        public async Task<IActionResult> UpdatePersonalPoint([FromBody] PersonalPointDTO personalPointDTO, int projectId, string userId)
-        {
-            await _projectService.EditPersonalPoint(personalPointDTO, projectId, userId);
-            return Ok();
-        }
+
     }
 }
