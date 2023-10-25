@@ -205,7 +205,7 @@ namespace Moneyboard.Core.Services
             if(user == null)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
             var userList = await _userProjectRepository.GetListAsync(x => x.UserId == userId);
-            if ( !userList.Any())
+            if (userList.Any())
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "In order to delete the account, you need to exit all projects");
             await _userManager.DeleteAsync(user);
         }

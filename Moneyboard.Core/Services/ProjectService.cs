@@ -363,9 +363,6 @@ namespace Moneyboard.Core.Services
             var bankCard = await _bankCardRepository.GetByKeyAsync(project.BankCardId);
 
 
-            if (totalPayments > bankCard.Money)
-                throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Not enough funds on the bank card");
-
             List<UserCalculatorPaymentDTO> memberList = new List<UserCalculatorPaymentDTO>();
             int allPoint = 0;
 
