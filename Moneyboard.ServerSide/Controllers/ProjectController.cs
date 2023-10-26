@@ -92,7 +92,7 @@ namespace Moneyboard.ServerSide.Controllers
         {
 
             await _projectService.EditProjectDateAsync(projectEditDTO, projectId, UserId);
-            return Ok("The project has been successfully updated");
+            return Ok();
         }
 
         [Authorize]
@@ -102,7 +102,7 @@ namespace Moneyboard.ServerSide.Controllers
         {
 
             await _bankCardService.EditBankCardDateAsync(bankCardEditDTO, projectId, UserId);
-            return Ok("The bankcard has been successfully updated");
+            return Ok();
         }
 
         [Authorize]
@@ -146,7 +146,7 @@ namespace Moneyboard.ServerSide.Controllers
         public async Task<IActionResult> DeleteRole(int projectId)
         {
             await _projectService.DeleteProjectAsync(projectId, UserId);
-            return Ok("Project deleted successfully");
+            return Ok();
         }
 
         [Authorize]
@@ -173,7 +173,7 @@ namespace Moneyboard.ServerSide.Controllers
         public IActionResult ScheduleProcessSalary(int projectId)
         {
             RecurringJob.AddOrUpdate($"ProccesSalary_Project_{projectId}", () => _projectService.ProccesSalary(projectId), Cron.Daily(10));
-            return Ok("Processing salary scheduled.");
+            return Ok();
         }
 
         [Authorize]

@@ -65,7 +65,7 @@ namespace Moneyboard.ServerSide.Controllers
         public async Task<IActionResult> DeleteRole(int roleId)
         {
             await _roleService.DeleteRoleAsync(roleId, UserId);
-            return Ok("Role deleted successfully");
+            return Ok();
         }
     }
 }

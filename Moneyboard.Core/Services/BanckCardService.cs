@@ -15,7 +15,6 @@ namespace Moneyboard.Core.Services
     {
         protected readonly IMapper _mapper;
         protected IRepository<BankCard> _bankCardBaseRepository;
-        //protected IBankCardRepository _bankCardRepository;
         protected readonly IHttpContextAccessor _httpContextAccessor;
         protected readonly IRepository<UserProject> _userProjectRepository;
         protected IRepository<Project> _projectRepository;
@@ -26,20 +25,14 @@ namespace Moneyboard.Core.Services
             IRepository<BankCard> bankCardBaseRepository,
             IRoleService roleService,
             IRepository<UserProject> userProjectRepository,
-            IRepository<Project> projectRepository
-                                                    //IProjectRepository projectBaseRepository,
-                                                    //IUserProjectRepository userProjectBaseRepository
-                                                    //IBankCardRepository bankCardRepository
-                                                    )
+            IRepository<Project> projectRepository)
         {
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
             _bankCardBaseRepository = bankCardBaseRepository;
             _userProjectRepository = userProjectRepository;
             _projectRepository = projectRepository;
-            //_projectBaseRepository = projectBaseRepository;
-            //_userProjectRepository = userProjectBaseRepository;
-            //_bankCardRepository = bankCardRepository;
+
         }
 
         public async Task EditBankCardDateAsync(BankCardEditDTO banckCardEditDTO, int projectId, string userId)

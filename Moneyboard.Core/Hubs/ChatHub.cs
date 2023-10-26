@@ -8,7 +8,7 @@ using static ServiceStack.Diagnostics.Events;
 
 namespace Moneyboard.Core.SignalRChat
 {
-    public class SignalRHub :Hub
+    public class ChatHub :Hub
     {
         public async Task SendMessage(string user, string message)
         {

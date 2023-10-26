@@ -50,7 +50,7 @@ namespace Moneyboard.ServerSide.Controllers
         public async Task<IActionResult> UploadUserImage([FromForm] UserImageUploadDTO imageDTO)
         {
             await _userService.UploadAvatar(imageDTO, UserId);
-            return Ok("Image uploaded successfully");
+            return Ok();
 
         }
         [Authorize]

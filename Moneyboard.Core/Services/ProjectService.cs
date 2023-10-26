@@ -155,11 +155,11 @@ namespace Moneyboard.Core.Services
 
         }
 
-        private async Task Notification(string userId, string message)
+        /*private async Task Notification(string userId, string message)
         {
             await _notificationService.SendNotificationToUser(userId, message);
 
-        }
+        }*/
         private async Task CreateUserProject(string userId, int projectId, bool isOwner, Role role)
         {
             var project = await _projectRepository.GetByKeyAsync(projectId);
@@ -215,14 +215,8 @@ namespace Moneyboard.Core.Services
             project.Currency = projectEditDTO.Currency;
             project.BaseSalary = projectEditDTO.BaseSalary;
             project.Name = projectEditDTO.Name;
-            project.ProjectPoinPercent = projectEditDTO.ProjectPoinPercent;
             project.SalaryDate = GetSalaryDate(projectEditDTO.SalaryDay);
 
-            var userProject = await _userProjectRepository.GetListAsync(x => x.ProjectId == projectId);
-            foreach (var users in userProject)
-            {
-                await Notification(users.UserId, "Project data has been changed ");
-            }
 
             await _projectRepository.UpdateAsync(project);
             await _projectRepository.SaveChangesAsync();
@@ -235,12 +229,6 @@ namespace Moneyboard.Core.Services
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.ProjectNotFound);
 
             project.ProjectPoinPercent = projectPointProcent.ProjectPoinPercent;
-
-            var userProject = await _userProjectRepository.GetListAsync(x => x.ProjectId == projectId);
-            foreach (var users in userProject)
-            {
-                await Notification(users.UserId, "Project data has been changed");
-            }
 
             await _projectRepository.UpdateAsync(project);
             await _projectRepository.SaveChangesAsync();
@@ -500,11 +488,7 @@ namespace Moneyboard.Core.Services
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Not enough rights");
             var userProjectDelete = await _userProjectRepository.GetEntityAsync(x => x.UserId == userId && x.ProjectId == projectId);
 
-            var userProjects = await _userProjectRepository.GetListAsync(x => x.ProjectId == projectId);
-            foreach (var users in userProjects)
-            {
-                await Notification(users.UserId, "Project data has been changed");
-            }
+
 
 
             await _userProjectRepository.DeleteAsync(userProjectDelete);

@@ -11,9 +11,9 @@ namespace Moneyboard.Core.Services
 {
     public class NotificationService: INotificationService
     {
-        private readonly IHubContext<SignalRHub> _hubContext;
+        private readonly IHubContext<ChatHub> _hubContext;
 
-        public NotificationService(IHubContext<SignalRHub> hubContext)
+        public NotificationService(IHubContext<ChatHub> hubContext)
         {
             _hubContext = hubContext;
         }

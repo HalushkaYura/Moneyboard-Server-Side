@@ -82,8 +82,7 @@ namespace Moneyboard.ServerSide
                 app.UseSwaggerUI();
             }
             //
-            //app.MapHub<SignalRHub>("/notificationHub");
-
+           
             //
             app.UseHttpsRedirection();
 

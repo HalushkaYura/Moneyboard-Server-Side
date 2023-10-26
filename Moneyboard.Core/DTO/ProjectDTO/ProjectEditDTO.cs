@@ -8,7 +8,5 @@ namespace Moneyboard.Core.DTO.ProjectDTO
         public double BaseSalary { get; set; }
         public int SalaryDay { get; set; }
         public string Currency { get; set; }
-        public int ProjectPoinPercent { get; set; }
-
     }
 }
