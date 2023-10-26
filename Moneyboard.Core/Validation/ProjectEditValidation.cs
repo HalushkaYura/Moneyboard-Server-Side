@@ -28,7 +28,6 @@ namespace Moneyboard.Core.Validation
             RuleFor(dto => dto.Currency)
                 .NotEmpty()
                 .NotNull();
-
         }
 
     }

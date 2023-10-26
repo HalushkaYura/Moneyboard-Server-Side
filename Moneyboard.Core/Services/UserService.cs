@@ -198,6 +198,23 @@ namespace Moneyboard.Core.Services
             return imageUrl;
         }
 
+       /* public async Task<byte[]> GetUserImageAsync(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                throw new HttpException(System.Net.HttpStatusCode.BadRequest, ErrorMessages.UserNotFound);
+            }
+
+            var imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "images/users", user.ImageUrl);
+
+            if (!System.IO.File.Exists(imagePath))
+            {
+                return new byte[0]; // Повертаємо порожній масив
+            }
+
+            return await System.IO.File.ReadAllBytesAsync(imagePath);
+        }*/
 
         public async Task DeleteUserAccount(string userId)
         {

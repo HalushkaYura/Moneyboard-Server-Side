@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Moneyboard.Core.ApiModels;
 using Moneyboard.Core.DTO.UserDTO;
 using System;
@@ -24,6 +26,8 @@ namespace Moneyboard.Core.Interfaces.Services
         //----------------------------------------------------------
         Task UploadAvatar(UserImageUploadDTO imageDTO, string userId);
         Task<string> GetUserImageAsync(string userId);
+        //Task<byte[]> GetUserImageAsync(string email);
+
         Task DeleteUserAccount(string userId);
     }
 }

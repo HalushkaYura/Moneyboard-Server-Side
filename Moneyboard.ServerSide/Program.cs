@@ -71,7 +71,7 @@ namespace Moneyboard.ServerSide
             app.UseHangfireDashboard();
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
-
+            app.UseStaticFiles();
             //ADDED
             app.UseCors(x => x.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod());
             //
