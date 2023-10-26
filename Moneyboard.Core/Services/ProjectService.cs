@@ -484,7 +484,7 @@ namespace Moneyboard.Core.Services
         public async Task DeleteUserWithProject(string userId, int projectId, string userActive)
         {
             var userProject = await _userProjectRepository.GetEntityAsync(x => x.UserId == userActive && x.ProjectId == projectId);
-            if (userProject.IsOwner != null)
+            if (userProject.IsOwner != true)
                 throw new HttpException(System.Net.HttpStatusCode.BadRequest, "Not enough rights");
             var userProjectDelete = await _userProjectRepository.GetEntityAsync(x => x.UserId == userId && x.ProjectId == projectId);
 

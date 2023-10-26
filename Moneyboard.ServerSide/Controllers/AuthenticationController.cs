@@ -30,7 +30,7 @@ namespace Moneyboard.ServerSide.Controllers
                 Email = registrationDTO.Email,
                 BirthDate = registrationDTO.BirthDay,
                 CardNumber = registrationDTO.CardNumber,
-                ImageUrl = "1.png"
+                ImageUrl = "userBase.png"
             };
             await _authenticationService.RegistrationAsync(user, registrationDTO.Password, SystemRoles.User);
 
